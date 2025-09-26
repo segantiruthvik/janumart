@@ -18,6 +18,14 @@ interface Product {
   image?: string
   company?: string
   isAvailable: boolean
+  offer?: {
+    id: string
+    name: string
+    discountPercentage: number
+    endDate: string | Date
+    endTime: string
+    isActive: boolean
+  }
 }
 
 export default function HomePage() {

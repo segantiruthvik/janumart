@@ -38,10 +38,17 @@ export function isOfferActive(endDate: string | Date, endTime: string = '23:59')
       offerEnd.setHours(parseInt(hours), parseInt(minutes), 0, 0)
     }
   } else {
-    // If endDate is a string, parse it
-    offerEnd = new Date(`${endDate}T${endTime}:00`)
+    // If endDate is a string, check if it already has time info
+    if (endDate.includes('T')) {
+      // Date string already includes time (e.g., '2025-10-03T08:57:53.086Z')
+      offerEnd = new Date(endDate)
+    } else {
+      // Date string without time, add the endTime
+      offerEnd = new Date(`${endDate}T${endTime}:00`)
+    }
   }
   
+  console.log('isOfferActive debug:', { now, offerEnd, isActive: now < offerEnd })
   return now < offerEnd
 }
 

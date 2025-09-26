@@ -563,19 +563,44 @@ export default function AdminDashboard() {
                       )}
                     </div>
                     <p className="text-xs text-gray-500">
-                      ₹{product.pricePer100gm 
-                        ? product.pricePer100gm.toFixed(2)
-                        : product.weight && product.weightUnit
-                          ? calculatePricePer100gmFromWeight(product.price, product.weight, product.weightUnit).toFixed(2)
-                          : calculatePricePer100gmFromWeight(product.price, 1, 'kg').toFixed(2)
-                      }/100gm
+                      ₹{(() => {
+                        const hasActiveOffer = product.offer && isOfferActive(product.offer.endDate, product.offer.endTime)
+                        const displayPrice = hasActiveOffer 
+                          ? calculateDiscountedPrice(product.price, product.offer?.discountPercentage || 0)
+                          : product.price
+                        
+                        console.log(`Product: ${product.name}, Original: ${product.price}, Display: ${displayPrice}, HasOffer: ${hasActiveOffer}, DBPricePer100gm: ${product.pricePer100gm}`)
+                        console.log(`Offer details:`, product.offer)
+                        console.log(`Weight: ${product.weight} ${product.weightUnit}`)
+                        
+                        // FORCE calculation when there's an active offer, ignore DB value
+                        if (hasActiveOffer) {
+                          if (product.weight && product.weightUnit) {
+                            return calculatePricePer100gmFromWeight(displayPrice, product.weight, product.weightUnit).toFixed(2)
+                          }
+                          return calculatePricePer100gmFromWeight(displayPrice, 1, 'kg').toFixed(2)
+                        }
+                        
+                        // Only use product.pricePer100gm when there's no active offer
+                        if (product.pricePer100gm) {
+                          return product.pricePer100gm.toFixed(2)
+                        }
+                        
+                        // Calculate from original price when no offer and no DB value
+                        if (product.weight && product.weightUnit) {
+                          return calculatePricePer100gmFromWeight(product.price, product.weight, product.weightUnit).toFixed(2)
+                        }
+                        
+                        return calculatePricePer100gmFromWeight(product.price, 1, 'kg').toFixed(2)
+                      })()}/100gm
                       {product.offer && isOfferActive(product.offer.endDate, product.offer.endTime) && (
-                        <span className="ml-2 text-red-600">
-                          (Discounted: ₹{calculatePricePer100gmFromWeight(
-                            calculateDiscountedPrice(product.price, product.offer.discountPercentage), 
-                            product.weight || 1, 
-                            product.weightUnit || 'kg'
-                          ).toFixed(2)})
+                        <span className="ml-2 text-gray-400">
+                          (Original: ₹{product.pricePer100gm 
+                            ? product.pricePer100gm.toFixed(2)
+                            : product.weight && product.weightUnit
+                              ? calculatePricePer100gmFromWeight(product.price, product.weight, product.weightUnit).toFixed(2)
+                              : calculatePricePer100gmFromWeight(product.price, 1, 'kg').toFixed(2)
+                          })
                         </span>
                       )}
                     </p>
