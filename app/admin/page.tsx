@@ -48,6 +48,7 @@ export default function AdminDashboard() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [showOffers, setShowOffers] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -198,9 +199,14 @@ export default function AdminDashboard() {
     })
     setEditingProduct(null)
     setShowAddForm(false)
+    setIsEditing(false)
   }
 
   const startEdit = (product: Product) => {
+    if (isEditing) return // Prevent multiple clicks
+    
+    console.log('Starting edit for product:', product.name) // Debug log
+    setIsEditing(true)
     setEditingProduct(product)
     setFormData({
       name: product.name,
@@ -214,6 +220,10 @@ export default function AdminDashboard() {
       offerId: product.offer?.id || ''
     })
     setShowAddForm(true)
+    console.log('Form should be visible now') // Debug log
+    
+    // Reset editing state after a short delay
+    setTimeout(() => setIsEditing(false), 500)
   }
 
   if (status === 'loading' || loading) {
@@ -323,10 +333,18 @@ export default function AdminDashboard() {
 
         {/* Add/Edit Product Form */}
         {showAddForm && (
-          <div className="bg-white rounded-lg shadow p-6 mb-8">
-            <h2 className="text-lg font-semibold mb-4">
-              {editingProduct ? 'Edit Product' : 'Add New Product'}
-            </h2>
+          <div className="bg-white rounded-lg shadow p-6 mb-8 border-l-4 border-blue-500">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">
+                {editingProduct ? `Edit Product: ${editingProduct.name}` : 'Add New Product'}
+              </h2>
+              <button
+                onClick={resetForm}
+                className="text-gray-500 hover:text-gray-700 text-sm"
+              >
+                Cancel
+              </button>
+            </div>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -541,14 +559,29 @@ export default function AdminDashboard() {
                   </div>
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => startEdit(product)}
-                      className="text-blue-600 hover:text-blue-800"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        startEdit(product)
+                      }}
+                      disabled={isEditing}
+                      className={`p-1 rounded transition-colors ${
+                        isEditing 
+                          ? 'text-gray-400 cursor-not-allowed' 
+                          : 'text-blue-600 hover:text-blue-800 hover:bg-blue-50'
+                      }`}
+                      title={isEditing ? "Editing..." : "Edit product"}
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDelete(product.id)}
-                      className="text-red-600 hover:text-red-800"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleDelete(product.id)
+                      }}
+                      className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50 transition-colors"
+                      title="Delete product"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
