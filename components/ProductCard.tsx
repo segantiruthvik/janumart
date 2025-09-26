@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Plus, Package, Building2 } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, calculatePricePer100gmFromWeight, calculateDiscountedPrice, isOfferActive } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
 interface Product {
@@ -16,6 +16,14 @@ interface Product {
   image?: string
   company?: string
   isAvailable: boolean
+  offer?: {
+    id: string
+    name: string
+    discountPercentage: number
+    endDate: string | Date
+    endTime: string
+    isActive: boolean
+  }
 }
 
 interface ProductCardProps {
@@ -25,6 +33,28 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const [isAdding, setIsAdding] = useState(false)
   const { addItem } = useCartStore()
+
+  // Calculate pricing with offers
+  const hasActiveOffer = product.offer && isOfferActive(product.offer.endDate, product.offer.endTime)
+  const displayPrice = hasActiveOffer 
+    ? calculateDiscountedPrice(product.price, product.offer!.discountPercentage)
+    : product.price
+
+  // Calculate price per 100gm using discounted price
+  const getPricePer100gm = () => {
+    if (product.pricePer100gm && !hasActiveOffer) {
+      return product.pricePer100gm
+    }
+    
+    if (product.weight && product.weightUnit) {
+      return calculatePricePer100gmFromWeight(displayPrice, product.weight, product.weightUnit)
+    }
+    
+    // Default to 1kg if no weight specified
+    return calculatePricePer100gmFromWeight(displayPrice, 1, 'kg')
+  }
+
+  const pricePer100gm = getPricePer100gm()
 
   const handleAddToCart = async () => {
     if (!product.isAvailable) {
@@ -38,7 +68,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       addItem({
         id: product.id,
         name: product.name,
-        price: product.price,
+        price: displayPrice, // Use discounted price
         image: product.image,
         company: product.company
       })
@@ -103,8 +133,16 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className="flex items-center justify-between">
             <div>
               <span className="text-2xl font-bold text-primary-600">
-                ₹{product.price.toFixed(2)}
+                ₹{displayPrice.toFixed(2)}
               </span>
+              {hasActiveOffer && product.offer && (
+                <div className="text-sm text-gray-500">
+                  <span className="line-through">₹{product.price.toFixed(2)}</span>
+                  <span className="ml-2 text-red-600 font-medium">
+                    {product.offer.discountPercentage}% OFF
+                  </span>
+                </div>
+              )}
             </div>
             
             {/* Add to Cart Button */}
@@ -123,11 +161,14 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
           
           {/* Price per 100gm */}
-          {product.pricePer100gm && (
-            <div className="text-sm text-gray-600">
-              <span className="font-medium">₹{product.pricePer100gm.toFixed(2)}</span> per 100gm
-            </div>
-          )}
+          <div className="text-sm text-gray-600">
+            <span className="font-medium">₹{pricePer100gm.toFixed(2)}</span> per 100gm
+            {product.weight && product.weightUnit && (
+              <span className="ml-2 text-gray-500">
+                ({product.weight} {product.weightUnit})
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -216,15 +216,15 @@ function OfferForm({ offer, onClose, onSave }: OfferFormProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-hidden">
-        <div className="px-6 py-4 border-b">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] flex flex-col">
+        <div className="px-6 py-4 border-b flex-shrink-0">
           <h3 className="text-lg font-semibold">
             {offer ? 'Edit Offer' : 'Create New Offer'}
           </h3>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 flex-1 overflow-y-auto min-h-0" id="offer-form">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Offer Name *
@@ -315,9 +315,13 @@ function OfferForm({ offer, onClose, onSave }: OfferFormProps) {
             <label className="text-sm font-medium text-gray-700">Active</label>
           </div>
 
-          <div className="flex space-x-4 pt-4">
+        </form>
+        
+        <div className="p-6 border-t flex-shrink-0">
+          <div className="flex space-x-4">
             <button
               type="submit"
+              form="offer-form"
               className="flex-1 bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg font-medium"
             >
               {offer ? 'Update Offer' : 'Create Offer'}
@@ -330,7 +334,7 @@ function OfferForm({ offer, onClose, onSave }: OfferFormProps) {
               Cancel
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   )

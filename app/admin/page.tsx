@@ -17,6 +17,7 @@ import {
 import toast from 'react-hot-toast'
 import ImageUpload from '@/components/ImageUpload'
 import OfferManagement from '@/components/OfferManagement'
+import { calculatePricePer100gmFromWeight, calculateDiscountedPrice, isOfferActive } from '@/lib/utils'
 
 interface Product {
   id: string
@@ -222,6 +223,18 @@ export default function AdminDashboard() {
     setShowAddForm(true)
     console.log('Form should be visible now') // Debug log
     
+    // Scroll to the form after a short delay to ensure it's rendered
+    setTimeout(() => {
+      const formElement = document.getElementById('product-form')
+      if (formElement) {
+        formElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        })
+      }
+    }, 200)
+    
     // Reset editing state after a short delay
     setTimeout(() => setIsEditing(false), 500)
   }
@@ -345,7 +358,7 @@ export default function AdminDashboard() {
                 Cancel
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form id="product-form" onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Product Name *
@@ -549,11 +562,23 @@ export default function AdminDashboard() {
                         </div>
                       )}
                     </div>
-                    {product.pricePer100gm && (
-                      <p className="text-xs text-gray-500">
-                        ₹{product.pricePer100gm.toFixed(2)}/100gm
-                      </p>
-                    )}
+                    <p className="text-xs text-gray-500">
+                      ₹{product.pricePer100gm 
+                        ? product.pricePer100gm.toFixed(2)
+                        : product.weight && product.weightUnit
+                          ? calculatePricePer100gmFromWeight(product.price, product.weight, product.weightUnit).toFixed(2)
+                          : calculatePricePer100gmFromWeight(product.price, 1, 'kg').toFixed(2)
+                      }/100gm
+                      {product.offer && isOfferActive(product.offer.endDate, product.offer.endTime) && (
+                        <span className="ml-2 text-red-600">
+                          (Discounted: ₹{calculatePricePer100gmFromWeight(
+                            calculateDiscountedPrice(product.price, product.offer.discountPercentage), 
+                            product.weight || 1, 
+                            product.weightUnit || 'kg'
+                          ).toFixed(2)})
+                        </span>
+                      )}
+                    </p>
                     {product.weight && product.weightUnit && (
                       <p className="text-xs text-gray-500">
                         {product.weight} {product.weightUnit}
