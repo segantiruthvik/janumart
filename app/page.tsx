@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { Search, ShoppingCart, Package, Star } from 'lucide-react'
-import { useCartStore } from '@/lib/store'
-import { formatPrice } from '@/lib/utils'
-import CartButton from '@/components/CartButton'
-import ProductCard from '@/components/ProductCard'
-import Header from '@/components/Header'
+import { useCartStore } from '../lib/store'
+import { formatPrice } from '../lib/utils'
+import CartButton from '../components/CartButton'
+import ProductCard from '../components/ProductCard'
+import Header from '../components/Header'
 
 interface Product {
   id: string

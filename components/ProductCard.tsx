@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { Plus, Package, Building2, Minus } from 'lucide-react'
-import { useCartStore } from '@/lib/store'
-import { formatPrice, calculatePricePerGmFromWeight, calculateDiscountedPrice, isOfferActive } from '@/lib/utils'
+import { useCartStore } from '../lib/store'
+import { formatPrice, calculatePricePerGmFromWeight, calculateDiscountedPrice, isOfferActive } from '../lib/utils'
 import toast from 'react-hot-toast'
 
 interface Product {

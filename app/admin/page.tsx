@@ -15,9 +15,9 @@ import {
   Tag
 } from 'lucide-react'
 import toast from 'react-hot-toast'
-import ImageUpload from '@/components/ImageUpload'
-import OfferManagement from '@/components/OfferManagement'
-import { calculatePricePerGmFromWeight, calculateDiscountedPrice, isOfferActive } from '@/lib/utils'
+import ImageUpload from '../../components/ImageUpload'
+import OfferManagement from '../../components/OfferManagement'
+import { calculatePricePerGmFromWeight, calculateDiscountedPrice, isOfferActive } from '../../lib/utils'
 
 interface Product {
   id: string

@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { ShoppingCart, X, Minus, Plus, Trash2 } from 'lucide-react'
-import { useCartStore } from '@/lib/store'
-import { formatPrice, formatWhatsAppMessage, generateWhatsAppURL } from '@/lib/utils'
+import { useCartStore } from '../lib/store'
+import { formatPrice, formatWhatsAppMessage, generateWhatsAppURL } from '../lib/utils'
 import toast from 'react-hot-toast'
 
 export default function CartButton() {
