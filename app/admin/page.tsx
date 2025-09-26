@@ -534,9 +534,21 @@ export default function AdminDashboard() {
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      ₹{product.price.toFixed(2)}
-                    </p>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        ₹{product.price.toFixed(2)}
+                      </p>
+                      {product.offer && (
+                        <div className="text-xs">
+                          <p className="text-green-600 font-medium">
+                            Offer: ₹{Math.round(product.price * (1 - product.offer.discountPercentage / 100)).toFixed(2)}
+                          </p>
+                          <p className="text-gray-500">
+                            Save: ₹{(product.price - Math.round(product.price * (1 - product.offer.discountPercentage / 100))).toFixed(2)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                     {product.pricePer100gm && (
                       <p className="text-xs text-gray-500">
                         ₹{product.pricePer100gm.toFixed(2)}/100gm

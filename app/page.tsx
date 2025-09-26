@@ -18,14 +18,6 @@ interface Product {
   image?: string
   company?: string
   isAvailable: boolean
-  offer?: {
-    id: string
-    name: string
-    discountPercentage: number
-    endDate: string
-    endTime: string
-    isActive: boolean
-  }
 }
 
 export default function HomePage() {
@@ -35,9 +27,14 @@ export default function HomePage() {
   const [selectedCompany, setSelectedCompany] = useState('')
   const [companies, setCompanies] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
+  const [isClient, setIsClient] = useState(false)
   const { getTotalItems } = useCartStore()
 
   const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME || 'JANU ENTERPRISE'
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   useEffect(() => {
     fetchProducts()
@@ -74,7 +71,7 @@ export default function HomePage() {
       setFilteredProducts(data)
       
       // Extract unique companies for filter
-      const uniqueCompanies = [...new Set(data.map((product: Product) => product.company).filter(Boolean))]
+      const uniqueCompanies = Array.from(new Set(data.map((product: Product) => product.company).filter(Boolean))) as string[]
       setCompanies(uniqueCompanies)
     } catch (error) {
       console.error('Error fetching products:', error)
@@ -210,7 +207,7 @@ export default function HomePage() {
       </main>
 
       {/* Floating Cart Button */}
-      {getTotalItems() > 0 && <CartButton />}
+      {isClient && getTotalItems() > 0 && <CartButton />}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ShoppingCart, X, Minus, Plus, Trash2 } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatPrice, formatWhatsAppMessage, generateWhatsAppURL } from '@/lib/utils'
@@ -10,7 +10,12 @@ export default function CartButton() {
   const [isOpen, setIsOpen] = useState(false)
   const [customerName, setCustomerName] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
+  const [isClient, setIsClient] = useState(false)
   const { items, updateQuantity, removeItem, getTotalItems, getTotalPrice, clearCart } = useCartStore()
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   const handleWhatsAppOrder = () => {
     if (items.length === 0) {
@@ -43,7 +48,7 @@ export default function CartButton() {
       >
         <div className="relative">
           <ShoppingCart className="w-6 h-6" />
-          {getTotalItems() > 0 && (
+          {isClient && getTotalItems() > 0 && (
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
               {getTotalItems()}
             </span>

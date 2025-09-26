@@ -25,9 +25,23 @@ export function calculateDiscountedPricePer100gm(originalPrice: number, discount
   return calculatePricePer100gm(discountedPrice, weightInGrams)
 }
 
-export function isOfferActive(endDate: string, endTime: string = '23:59'): boolean {
+export function isOfferActive(endDate: string | Date, endTime: string = '23:59'): boolean {
   const now = new Date()
-  const offerEnd = new Date(`${endDate}T${endTime}:00`)
+  let offerEnd: Date
+  
+  if (endDate instanceof Date) {
+    // If endDate is already a Date object, use it directly
+    offerEnd = new Date(endDate)
+    // Set the time if endTime is provided
+    if (endTime) {
+      const [hours, minutes] = endTime.split(':')
+      offerEnd.setHours(parseInt(hours), parseInt(minutes), 0, 0)
+    }
+  } else {
+    // If endDate is a string, parse it
+    offerEnd = new Date(`${endDate}T${endTime}:00`)
+  }
+  
   return now < offerEnd
 }
 
