@@ -77,6 +77,40 @@ export default function AdminDashboard() {
     }
   }, [session])
 
+  // Rank change handler
+  const handleRankChange = async (productId: string, newRank: number) => {
+    const updatedProducts = products.map(product => {
+      if (product.id === productId) {
+        return { ...product, order: newRank }
+      }
+      return product
+    })
+
+    // Sort by new order
+    const sortedProducts = updatedProducts.sort((a, b) => a.order - b.order)
+    setProducts(sortedProducts)
+
+    try {
+      const response = await fetch('/api/products/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          products: sortedProducts.map(item => ({ id: item.id, order: item.order }))
+        })
+      })
+
+      if (response.ok) {
+        toast.success('Product rank updated!')
+      } else {
+        throw new Error('Failed to update rank')
+      }
+    } catch (error) {
+      console.error('Rank update error:', error)
+      toast.error('Failed to update product rank')
+      fetchProducts() // Revert on error
+    }
+  }
+
   const fetchProducts = async () => {
     try {
       const response = await fetch('/api/products')
@@ -502,12 +536,24 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-lg shadow">
           <div className="px-6 py-4 border-b">
             <h2 className="text-lg font-semibold">Products</h2>
-            <p className="text-sm text-gray-600">Use up/down arrows to reorder products</p>
+            <p className="text-sm text-gray-600">Enter rank directly or use up/down arrows to reorder products</p>
           </div>
           
           <div className="divide-y">
             {products.map((product, index) => (
               <div key={product.id} className="flex items-center p-4 hover:bg-gray-50">
+                {/* Rank Input */}
+                <div className="mr-4 w-16">
+                  <input
+                    type="number"
+                    min="0"
+                    max="999"
+                    value={product.order}
+                    onChange={(e) => handleRankChange(product.id, parseInt(e.target.value) || 0)}
+                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  />
+                </div>
+                
                 {/* Order Controls */}
                 <div className="flex flex-col space-y-1 mr-4">
                   <button

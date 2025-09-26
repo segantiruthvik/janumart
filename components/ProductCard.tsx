@@ -112,8 +112,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
         
-        {/* Availability Badge */}
-        <div className="absolute top-2 right-2">
+        {/* Availability Badge with Weight */}
+        <div className="absolute top-2 right-2 flex flex-col items-end space-y-1">
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
             product.isAvailable 
               ? 'bg-green-100 text-green-800' 
@@ -121,6 +121,11 @@ export default function ProductCard({ product }: ProductCardProps) {
           }`}>
             {product.isAvailable ? 'Available' : 'Not Available'}
           </span>
+          {product.weight && product.weightUnit && (
+            <span className="px-2 py-1 bg-white bg-opacity-90 rounded-full text-xs font-medium text-gray-700">
+              {product.weight} {product.weightUnit}
+            </span>
+          )}
         </div>
       </div>
 
@@ -140,26 +145,30 @@ export default function ProductCard({ product }: ProductCardProps) {
         </h3>
 
 
-        {/* Price */}
-        <div className="space-y-1">
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-2xl font-bold text-primary-600">
-                ₹{displayPrice.toFixed(2)}
+        {/* Price - Line 1: Current Price */}
+        <div className="space-y-2">
+          <div className="text-2xl font-bold text-primary-600">
+            ₹{displayPrice.toFixed(2)}
+          </div>
+          
+          {/* Line 2: Slashed Price and Offer */}
+          {hasActiveOffer && product.offer && (
+            <div className="flex items-center space-x-2 text-sm">
+              <span className="line-through text-gray-500">₹{product.price.toFixed(2)}</span>
+              <span className="text-red-600 font-medium">
+                {product.offer.discountPercentage}% OFF
               </span>
-              {hasActiveOffer && product.offer && (
-                <div className="text-sm text-gray-500">
-                  <span className="line-through">₹{product.price.toFixed(2)}</span>
-                  <span className="ml-2 text-red-600 font-medium">
-                    {product.offer.discountPercentage}% OFF
-                  </span>
-                </div>
-              )}
+            </div>
+          )}
+          
+          {/* Line 3: Per gm, Add Button, and Quantity Controls */}
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              <span className="font-medium">₹{pricePerGm.toFixed(2)}</span> per gm
             </div>
             
-            {/* Add Button and Quantity Controls */}
             <div className="flex items-center space-x-2">
-              {/* Quantity Controls */}
+              {/* Quantity Controls - Only show when quantity > 0 */}
               {currentQuantity > 0 && (
                 <div className="flex items-center space-x-1 bg-primary-50 border border-primary-200 rounded-lg px-2 py-1">
                   <button
@@ -178,30 +187,22 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </div>
               )}
               
-              {/* Add Button */}
-              <button
-                onClick={handleAddToCart}
-                disabled={!product.isAvailable || isAdding}
-                className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  !product.isAvailable
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-primary-500 hover:bg-primary-600 text-white'
-                }`}
-              >
-                <Plus className="w-3 h-3" />
-                <span>{isAdding ? 'Adding...' : 'Add'}</span>
-              </button>
+              {/* Add Button - Only show when quantity = 0 */}
+              {currentQuantity === 0 && (
+                <button
+                  onClick={handleAddToCart}
+                  disabled={!product.isAvailable || isAdding}
+                  className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    !product.isAvailable
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-primary-500 hover:bg-primary-600 text-white'
+                  }`}
+                >
+                  <Plus className="w-3 h-3" />
+                  <span>{isAdding ? 'Adding...' : 'Add'}</span>
+                </button>
+              )}
             </div>
-          </div>
-          
-          {/* Price per gm */}
-          <div className="text-sm text-gray-600">
-            <span className="font-medium">₹{pricePerGm.toFixed(2)}</span> per gm
-            {product.weight && product.weightUnit && (
-              <span className="ml-2 text-gray-500">
-                ({product.weight} {product.weightUnit})
-              </span>
-            )}
           </div>
         </div>
       </div>
