@@ -49,6 +49,11 @@ export default function HomePage() {
   }, [])
 
   useEffect(() => {
+    if (!Array.isArray(products)) {
+      setFilteredProducts([])
+      return
+    }
+    
     if (searchTerm || selectedCompany) {
       let filtered = products
       
@@ -75,22 +80,42 @@ export default function HomePage() {
     try {
       const response = await fetch('/api/products?available=true')
       const data = await response.json()
-      setProducts(data)
-      setFilteredProducts(data)
       
-      // Extract unique companies for filter
-      const uniqueCompanies = Array.from(new Set(data.map((product: Product) => product.company).filter(Boolean))) as string[]
-      setCompanies(uniqueCompanies)
+      if (!response.ok) {
+        console.error('Error fetching products:', data.error)
+        setProducts([])
+        setFilteredProducts([])
+        setCompanies([])
+        return
+      }
+      
+      // Ensure data is an array
+      if (Array.isArray(data)) {
+        setProducts(data)
+        setFilteredProducts(data)
+        
+        // Extract unique companies for filter
+        const uniqueCompanies = Array.from(new Set(data.map((product: Product) => product.company).filter(Boolean))) as string[]
+        setCompanies(uniqueCompanies)
+      } else {
+        console.error('Invalid data format:', data)
+        setProducts([])
+        setFilteredProducts([])
+        setCompanies([])
+      }
     } catch (error) {
       console.error('Error fetching products:', error)
+      setProducts([])
+      setFilteredProducts([])
+      setCompanies([])
     } finally {
       setLoading(false)
     }
   }
 
-  const availableProducts = filteredProducts.filter(product => 
-    product.isAvailable
-  )
+  const availableProducts = Array.isArray(filteredProducts) 
+    ? filteredProducts.filter(product => product.isAvailable)
+    : []
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream-50 to-primary-50">
