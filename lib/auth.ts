@@ -57,7 +57,7 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token) {
-        (session.user as any).id = token.sub!
+        (session.user as any).id = token.sub
         (session.user as any).isAdmin = token.isAdmin as boolean
       }
       return session
