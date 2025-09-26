@@ -44,7 +44,7 @@ async function main() {
     {
       name: 'Premium Basmati Rice',
       price: 450,
-      pricePer100gm: 45,
+      pricePerGm: 0.45,
       weight: 1.0,
       weightUnit: 'kg',
       company: 'Royal Foods',
@@ -56,7 +56,7 @@ async function main() {
     {
       name: 'Extra Virgin Olive Oil',
       price: 650,
-      pricePer100gm: 65,
+      pricePerGm: 0.65,
       weight: 1.0,
       weightUnit: 'kg',
       company: 'Mediterranean Gold',
@@ -68,7 +68,7 @@ async function main() {
     {
       name: 'Whole Wheat Flour',
       price: 120,
-      pricePer100gm: 12,
+      pricePerGm: 0.12,
       weight: 1.0,
       weightUnit: 'kg',
       company: 'Farm Fresh',
@@ -79,7 +79,7 @@ async function main() {
     {
       name: 'Organic Quinoa',
       price: 800,
-      pricePer100gm: 80,
+      pricePerGm: 0.80,
       weight: 1.0,
       weightUnit: 'kg',
       company: 'Nature\'s Best',
@@ -91,7 +91,7 @@ async function main() {
     {
       name: 'Coconut Oil',
       price: 280,
-      pricePer100gm: 28,
+      pricePerGm: 0.28,
       weight: 1.0,
       weightUnit: 'kg',
       company: 'Tropical Pure',
@@ -102,7 +102,7 @@ async function main() {
     {
       name: 'Mixed Nuts',
       price: 950,
-      pricePer100gm: 95,
+      pricePerGm: 0.95,
       weight: 1.0,
       weightUnit: 'kg',
       company: 'Nutty Delights',
@@ -114,7 +114,7 @@ async function main() {
     {
       name: 'Brown Sugar',
       price: 180,
-      pricePer100gm: 18,
+      pricePerGm: 0.18,
       weight: 500,
       weightUnit: 'gm',
       company: 'Sweet Harvest',
@@ -125,7 +125,7 @@ async function main() {
     {
       name: 'Black Pepper',
       price: 320,
-      pricePer100gm: 32,
+      pricePerGm: 0.32,
       weight: 100,
       weightUnit: 'gm',
       company: 'Spice World',

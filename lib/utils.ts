@@ -6,23 +6,23 @@ export function calculateDiscountedPrice(originalPrice: number, discountPercenta
   return Math.round(originalPrice - discountAmount)
 }
 
-export function calculatePricePer100gm(price: number, weightInGrams: number): number {
-  return Math.round((price / weightInGrams) * 100)
+export function calculatePricePerGm(price: number, weightInGrams: number): number {
+  return Math.round((price / weightInGrams) * 100) / 100
 }
 
-export function calculatePricePer100gmFromWeight(price: number, weight: number, unit: string): number {
+export function calculatePricePerGmFromWeight(price: number, weight: number, unit: string): number {
   // Convert weight to grams
   const weightInGrams = unit === 'kg' ? weight * 1000 : weight
-  return calculatePricePer100gm(price, weightInGrams)
+  return calculatePricePerGm(price, weightInGrams)
 }
 
 export function formatWeight(weight: number, unit: string): string {
   return `${weight} ${unit}`
 }
 
-export function calculateDiscountedPricePer100gm(originalPrice: number, discountPercentage: number, weightInGrams: number = 1000): number {
+export function calculateDiscountedPricePerGm(originalPrice: number, discountPercentage: number, weightInGrams: number = 1000): number {
   const discountedPrice = calculateDiscountedPrice(originalPrice, discountPercentage)
-  return calculatePricePer100gm(discountedPrice, weightInGrams)
+  return calculatePricePerGm(discountedPrice, weightInGrams)
 }
 
 export function isOfferActive(endDate: string | Date, endTime: string = '23:59'): boolean {

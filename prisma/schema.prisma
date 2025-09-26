@@ -63,7 +63,7 @@ model Product {
   id          String   @id @default(cuid())
   name        String
   price       Float
-  pricePer100gm Float? // Price per 100gm
+  pricePerGm Float? // Price per gm
   weight      Float?   // Weight value
   weightUnit  String?  // Weight unit (kg or gm)
   image       String?

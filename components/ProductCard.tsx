@@ -3,14 +3,14 @@
 import { useState } from 'react'
 import { Plus, Package, Building2 } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
-import { formatPrice, calculatePricePer100gmFromWeight, calculateDiscountedPrice, isOfferActive } from '@/lib/utils'
+import { formatPrice, calculatePricePerGmFromWeight, calculateDiscountedPrice, isOfferActive } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
 interface Product {
   id: string
   name: string
   price: number
-  pricePer100gm?: number
+  pricePerGm?: number
   weight?: number
   weightUnit?: string
   image?: string
@@ -40,21 +40,21 @@ export default function ProductCard({ product }: ProductCardProps) {
     ? calculateDiscountedPrice(product.price, product.offer!.discountPercentage)
     : product.price
 
-  // Calculate price per 100gm using discounted price
-  const getPricePer100gm = () => {
-    if (product.pricePer100gm && !hasActiveOffer) {
-      return product.pricePer100gm
+  // Calculate price per gm using discounted price
+  const getPricePerGm = () => {
+    if (product.pricePerGm && !hasActiveOffer) {
+      return product.pricePerGm
     }
     
     if (product.weight && product.weightUnit) {
-      return calculatePricePer100gmFromWeight(displayPrice, product.weight, product.weightUnit)
+      return calculatePricePerGmFromWeight(displayPrice, product.weight, product.weightUnit)
     }
     
     // Default to 1kg if no weight specified
-    return calculatePricePer100gmFromWeight(displayPrice, 1, 'kg')
+    return calculatePricePerGmFromWeight(displayPrice, 1, 'kg')
   }
 
-  const pricePer100gm = getPricePer100gm()
+  const pricePerGm = getPricePerGm()
 
   const handleAddToCart = async () => {
     if (!product.isAvailable) {
@@ -160,9 +160,9 @@ export default function ProductCard({ product }: ProductCardProps) {
             </button>
           </div>
           
-          {/* Price per 100gm */}
+          {/* Price per gm */}
           <div className="text-sm text-gray-600">
-            <span className="font-medium">₹{pricePer100gm.toFixed(2)}</span> per 100gm
+            <span className="font-medium">₹{pricePerGm.toFixed(2)}</span> per gm
             {product.weight && product.weightUnit && (
               <span className="ml-2 text-gray-500">
                 ({product.weight} {product.weightUnit})

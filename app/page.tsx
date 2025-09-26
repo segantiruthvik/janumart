@@ -12,7 +12,7 @@ interface Product {
   id: string
   name: string
   price: number
-  pricePer100gm?: number
+  pricePerGm?: number
   weight?: number
   weightUnit?: string
   image?: string

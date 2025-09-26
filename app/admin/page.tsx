@@ -17,13 +17,13 @@ import {
 import toast from 'react-hot-toast'
 import ImageUpload from '@/components/ImageUpload'
 import OfferManagement from '@/components/OfferManagement'
-import { calculatePricePer100gmFromWeight, calculateDiscountedPrice, isOfferActive } from '@/lib/utils'
+import { calculatePricePerGmFromWeight, calculateDiscountedPrice, isOfferActive } from '@/lib/utils'
 
 interface Product {
   id: string
   name: string
   price: number
-  pricePer100gm?: number
+  pricePerGm?: number
   weight?: number
   weightUnit?: string
   image?: string
@@ -53,7 +53,7 @@ export default function AdminDashboard() {
   const [formData, setFormData] = useState({
     name: '',
     price: '',
-    pricePer100gm: '',
+    pricePerGm: '',
     weight: '',
     weightUnit: 'kg',
     company: '',
@@ -112,7 +112,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({
           ...formData,
           price: parseFloat(formData.price),
-          pricePer100gm: formData.pricePer100gm ? parseFloat(formData.pricePer100gm) : null,
+          pricePerGm: formData.pricePerGm ? parseFloat(formData.pricePerGm) : null,
           weight: formData.weight ? parseFloat(formData.weight) : null,
           offerId: formData.offerId || null
         })
@@ -190,7 +190,7 @@ export default function AdminDashboard() {
     setFormData({
       name: '',
       price: '',
-      pricePer100gm: '',
+      pricePerGm: '',
       weight: '',
       weightUnit: 'kg',
       company: '',
@@ -212,7 +212,7 @@ export default function AdminDashboard() {
     setFormData({
       name: product.name,
       price: product.price.toString(),
-      pricePer100gm: product.pricePer100gm?.toString() || '',
+      pricePerGm: product.pricePerGm?.toString() || '',
       weight: product.weight?.toString() || '',
       weightUnit: product.weightUnit || 'kg',
       company: product.company || '',
@@ -407,13 +407,13 @@ export default function AdminDashboard() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Price per 100gm
+                  Price per gm
                 </label>
                 <input
                   type="number"
                   step="0.01"
-                  value={formData.pricePer100gm}
-                  onChange={(e) => setFormData({ ...formData, pricePer100gm: e.target.value })}
+                  value={formData.pricePerGm}
+                  onChange={(e) => setFormData({ ...formData, pricePerGm: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="45.00"
                 />
@@ -569,37 +569,37 @@ export default function AdminDashboard() {
                           ? calculateDiscountedPrice(product.price, product.offer?.discountPercentage || 0)
                           : product.price
                         
-                        console.log(`Product: ${product.name}, Original: ${product.price}, Display: ${displayPrice}, HasOffer: ${hasActiveOffer}, DBPricePer100gm: ${product.pricePer100gm}`)
+                        console.log(`Product: ${product.name}, Original: ${product.price}, Display: ${displayPrice}, HasOffer: ${hasActiveOffer}, DBPricePerGm: ${product.pricePerGm}`)
                         console.log(`Offer details:`, product.offer)
                         console.log(`Weight: ${product.weight} ${product.weightUnit}`)
                         
                         // FORCE calculation when there's an active offer, ignore DB value
                         if (hasActiveOffer) {
                           if (product.weight && product.weightUnit) {
-                            return calculatePricePer100gmFromWeight(displayPrice, product.weight, product.weightUnit).toFixed(2)
+                            return calculatePricePerGmFromWeight(displayPrice, product.weight, product.weightUnit).toFixed(2)
                           }
-                          return calculatePricePer100gmFromWeight(displayPrice, 1, 'kg').toFixed(2)
+                          return calculatePricePerGmFromWeight(displayPrice, 1, 'kg').toFixed(2)
                         }
                         
-                        // Only use product.pricePer100gm when there's no active offer
-                        if (product.pricePer100gm) {
-                          return product.pricePer100gm.toFixed(2)
+                        // Only use product.pricePerGm when there's no active offer
+                        if (product.pricePerGm) {
+                          return product.pricePerGm.toFixed(2)
                         }
                         
                         // Calculate from original price when no offer and no DB value
                         if (product.weight && product.weightUnit) {
-                          return calculatePricePer100gmFromWeight(product.price, product.weight, product.weightUnit).toFixed(2)
+                          return calculatePricePerGmFromWeight(product.price, product.weight, product.weightUnit).toFixed(2)
                         }
                         
-                        return calculatePricePer100gmFromWeight(product.price, 1, 'kg').toFixed(2)
-                      })()}/100gm
+                        return calculatePricePerGmFromWeight(product.price, 1, 'kg').toFixed(2)
+                      })()}/gm
                       {product.offer && isOfferActive(product.offer.endDate, product.offer.endTime) && (
                         <span className="ml-2 text-gray-400">
-                          (Original: ₹{product.pricePer100gm 
-                            ? product.pricePer100gm.toFixed(2)
+                          (Original: ₹{product.pricePerGm 
+                            ? product.pricePerGm.toFixed(2)
                             : product.weight && product.weightUnit
-                              ? calculatePricePer100gmFromWeight(product.price, product.weight, product.weightUnit).toFixed(2)
-                              : calculatePricePer100gmFromWeight(product.price, 1, 'kg').toFixed(2)
+                              ? calculatePricePerGmFromWeight(product.price, product.weight, product.weightUnit).toFixed(2)
+                              : calculatePricePerGmFromWeight(product.price, 1, 'kg').toFixed(2)
                           })
                         </span>
                       )}
