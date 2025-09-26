@@ -11,6 +11,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
     }
 
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      return NextResponse.json({ error: 'Only image files are allowed' }, { status: 400 })
+    }
+
+    // Validate file size (max 5MB after compression)
+    if (file.size > 5 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File size must be less than 5MB' }, { status: 400 })
+    }
+
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
@@ -22,20 +32,23 @@ export async function POST(request: NextRequest) {
       // Directory might already exist
     }
 
-    // Generate unique filename
+    // Generate unique filename with proper extension
     const timestamp = Date.now()
-    const filename = `${timestamp}-${file.name}`
+    const fileExtension = file.name.split('.').pop() || 'jpg'
+    const filename = `${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
     const path = join(uploadsDir, filename)
 
     await writeFile(path, buffer)
 
-    // Return the public URL
+    // Return the public URL with file info
     const fileUrl = `/uploads/${filename}`
     
     return NextResponse.json({ 
       success: true, 
       fileUrl,
-      filename 
+      filename,
+      originalSize: file.size,
+      type: file.type
     })
   } catch (error) {
     console.error('Error uploading file:', error)

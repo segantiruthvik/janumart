@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Package, Building2 } from 'lucide-react'
+import { Plus, Package, Building2, Minus } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatPrice, calculatePricePerGmFromWeight, calculateDiscountedPrice, isOfferActive } from '@/lib/utils'
 import toast from 'react-hot-toast'
@@ -32,7 +32,11 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const [isAdding, setIsAdding] = useState(false)
-  const { addItem } = useCartStore()
+  const { addItem, items, updateQuantity } = useCartStore()
+
+  // Get current cart item for this product
+  const cartItem = items.find(item => item.id === product.id)
+  const currentQuantity = cartItem?.quantity || 0
 
   // Calculate pricing with offers
   const hasActiveOffer = product.offer && isOfferActive(product.offer.endDate, product.offer.endTime)
@@ -78,6 +82,14 @@ export default function ProductCard({ product }: ProductCardProps) {
       toast.error('Failed to add item to cart')
     } finally {
       setIsAdding(false)
+    }
+  }
+
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity <= 0) {
+      updateQuantity(product.id, 0)
+    } else {
+      updateQuantity(product.id, newQuantity)
     }
   }
 
@@ -145,19 +157,41 @@ export default function ProductCard({ product }: ProductCardProps) {
               )}
             </div>
             
-            {/* Add to Cart Button */}
-            <button
-              onClick={handleAddToCart}
-              disabled={!product.isAvailable || isAdding}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                !product.isAvailable
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-primary-500 hover:bg-primary-600 text-white'
-              }`}
-            >
-              <Plus className="w-4 h-4" />
-              <span>{isAdding ? 'Adding...' : 'Add to Cart'}</span>
-            </button>
+            {/* Add Button and Quantity Controls */}
+            <div className="flex items-center space-x-2">
+              {/* Quantity Controls */}
+              {currentQuantity > 0 && (
+                <div className="flex items-center space-x-1 bg-primary-50 border border-primary-200 rounded-lg px-2 py-1">
+                  <button
+                    onClick={() => handleQuantityChange(currentQuantity - 1)}
+                    className="w-6 h-6 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-colors"
+                  >
+                    <Minus className="w-3 h-3" />
+                  </button>
+                  <span className="text-sm font-semibold px-2 text-primary-700">{currentQuantity}</span>
+                  <button
+                    onClick={() => handleQuantityChange(currentQuantity + 1)}
+                    className="w-6 h-6 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-colors"
+                  >
+                    <Plus className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+              
+              {/* Add Button */}
+              <button
+                onClick={handleAddToCart}
+                disabled={!product.isAvailable || isAdding}
+                className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  !product.isAvailable
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-primary-500 hover:bg-primary-600 text-white'
+                }`}
+              >
+                <Plus className="w-3 h-3" />
+                <span>{isAdding ? 'Adding...' : 'Add'}</span>
+              </button>
+            </div>
           </div>
           
           {/* Price per gm */}

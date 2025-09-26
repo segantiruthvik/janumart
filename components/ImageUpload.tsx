@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Upload, X, Image as ImageIcon } from 'lucide-react'
+import { Upload, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface ImageUploadProps {
@@ -12,7 +12,65 @@ interface ImageUploadProps {
 
 export default function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false)
+  const [compressing, setCompressing] = useState(false)
   const [preview, setPreview] = useState<string | null>(value || null)
+
+  // Custom image compression function
+  const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const img = new Image()
+
+      img.onload = () => {
+        try {
+          // Calculate new dimensions
+          let { width, height } = img
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width
+            width = maxWidth
+          }
+
+          // Set canvas dimensions
+          canvas.width = width
+          canvas.height = height
+
+          // Draw and compress
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height)
+            
+            canvas.toBlob(
+              (blob) => {
+                if (blob) {
+                  const compressedFile = new File([blob], file.name, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now(),
+                  })
+                  resolve(compressedFile)
+                } else {
+                  resolve(file) // Fallback to original file
+                }
+              },
+              'image/jpeg',
+              quality
+            )
+          } else {
+            resolve(file) // Fallback if no context
+          }
+        } catch (error) {
+          console.error('Compression error:', error)
+          resolve(file) // Fallback to original file
+        }
+      }
+
+      img.onerror = () => {
+        console.error('Image load error')
+        resolve(file) // Fallback to original file
+      }
+
+      img.src = URL.createObjectURL(file)
+    })
+  }
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -24,17 +82,30 @@ export default function ImageUpload({ value, onChange, disabled }: ImageUploadPr
       return
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB')
+    // Validate file size (max 10MB before compression)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File size must be less than 10MB')
       return
     }
 
-    setUploading(true)
+    setCompressing(true)
 
     try {
+      // Compress the image
+      const compressedFile = await compressImage(file, 800, 0.8)
+      
+      // Show compression results
+      const originalSize = (file.size / 1024 / 1024).toFixed(2)
+      const compressedSize = (compressedFile.size / 1024 / 1024).toFixed(2)
+      const compressionRatio = ((1 - compressedFile.size / file.size) * 100).toFixed(1)
+      
+      console.log(`Image compressed: ${originalSize}MB → ${compressedSize}MB (${compressionRatio}% reduction)`)
+      
+      setCompressing(false)
+      setUploading(true)
+
       const formData = new FormData()
-      formData.append('file', file)
+      formData.append('file', compressedFile)
 
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -47,7 +118,7 @@ export default function ImageUpload({ value, onChange, disabled }: ImageUploadPr
         const fileUrl = `${window.location.origin}${result.fileUrl}`
         setPreview(fileUrl)
         onChange(fileUrl)
-        toast.success('Image uploaded successfully!')
+        toast.success(`Image uploaded successfully! (Compressed from ${originalSize}MB to ${compressedSize}MB)`)
       } else {
         toast.error('Failed to upload image')
       }
@@ -55,6 +126,7 @@ export default function ImageUpload({ value, onChange, disabled }: ImageUploadPr
       console.error('Upload error:', error)
       toast.error('Failed to upload image')
     } finally {
+      setCompressing(false)
       setUploading(false)
     }
   }
@@ -99,17 +171,24 @@ export default function ImageUpload({ value, onChange, disabled }: ImageUploadPr
         <label
           htmlFor="image-upload"
           className={`cursor-pointer flex flex-col items-center space-y-2 ${
-            disabled || uploading ? 'opacity-50 cursor-not-allowed' : ''
+            disabled || uploading || compressing ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >
-          {uploading ? (
+          {compressing ? (
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+              <span className="text-blue-500 text-sm">Compressing...</span>
+            </div>
+          ) : uploading ? (
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
           ) : (
             <Upload className="w-8 h-8 text-gray-400" />
           )}
           
           <div className="text-sm text-gray-600">
-            {uploading ? (
+            {compressing ? (
+              'Compressing image...'
+            ) : uploading ? (
               'Uploading...'
             ) : preview ? (
               'Click to change image'
@@ -119,7 +198,11 @@ export default function ImageUpload({ value, onChange, disabled }: ImageUploadPr
           </div>
           
           <div className="text-xs text-gray-500">
-            PNG, JPG, GIF up to 5MB
+            {compressing ? (
+              'Optimizing for web...'
+            ) : (
+              'PNG, JPG, GIF up to 10MB (auto-compressed)'
+            )}
           </div>
         </label>
       </div>
