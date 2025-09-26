@@ -51,16 +51,19 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.isAdmin = (user as any).isAdmin
+        token.isAdmin = user.isAdmin;
       }
-      return token
+      return token;
     },
     async session({ session, token }) {
       if (token) {
-        (session.user as any).id = token.sub
-        (session.user as any).isAdmin = token.isAdmin as boolean
+        session.user = {
+          ...session.user,
+          id: token.sub,
+          isAdmin: token.isAdmin ?? false
+        };
       }
-      return session
+      return session;
     }
   },
   pages: {
