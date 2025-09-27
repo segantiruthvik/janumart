@@ -146,11 +146,11 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Search and Filter Bar - Mobile Optimized */}
+        {/* Search and Filter Bar - One Line Layout */}
         <div className="max-w-4xl mx-auto mb-4 sm:mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             {/* Search Bar */}
-            <div className="relative">
+            <div className="relative flex-1">
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
@@ -162,7 +162,7 @@ export default function HomePage() {
             </div>
             
             {/* Company Filter */}
-            <div className="relative">
+            <div className="relative flex-1 sm:flex-none sm:w-48">
               <select
                 value={selectedCompany}
                 onChange={(e) => setSelectedCompany(e.target.value)}

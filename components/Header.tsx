@@ -1,11 +1,19 @@
 'use client'
 
-import { ShoppingBag, Phone, Mail } from 'lucide-react'
+import { ShoppingBag, Phone, Mail, ShoppingCart } from 'lucide-react'
+import { useCartStore } from '../lib/store'
+import { useState, useEffect } from 'react'
 
 export default function Header() {
   const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME || 'JANU ENTERPRISE'
   const businessPhone = process.env.NEXT_PUBLIC_BUSINESS_PHONE || '+91 9014231299'
   const businessEmail = process.env.NEXT_PUBLIC_BUSINESS_EMAIL || 'janugamez@gmail.com'
+  const { getTotalItems } = useCartStore()
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-40">
@@ -22,27 +30,38 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Contact Info - Desktop */}
-          <div className="hidden lg:flex items-center space-x-4 text-sm text-brown-600">
-            <div className="flex items-center space-x-1">
-              <Phone className="w-4 h-4" />
-              <span>{businessPhone}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Mail className="w-4 h-4" />
-              <span>{businessEmail}</span>
-            </div>
-          </div>
+          {/* Right Side - Contact and Cart */}
+          <div className="flex items-center space-x-3 sm:space-x-4">
+            {/* Cart Info */}
+            {isClient && getTotalItems() > 0 && (
+              <div className="flex items-center space-x-1 text-primary-600">
+                <ShoppingCart className="w-4 h-4" />
+                <span className="text-xs sm:text-sm font-medium">Cart ({getTotalItems()})</span>
+              </div>
+            )}
 
-          {/* Mobile Contact */}
-          <div className="lg:hidden">
-            <a 
-              href={`tel:${businessPhone.replace(/\s/g, '')}`}
-              className="flex items-center space-x-1 text-primary-600 hover:text-primary-700"
-            >
-              <Phone className="w-4 h-4" />
-              <span className="text-xs sm:text-sm">Call</span>
-            </a>
+            {/* Contact Info - Desktop */}
+            <div className="hidden lg:flex items-center space-x-4 text-sm text-brown-600">
+              <div className="flex items-center space-x-1">
+                <Phone className="w-4 h-4" />
+                <span>{businessPhone}</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <Mail className="w-4 h-4" />
+                <span>{businessEmail}</span>
+              </div>
+            </div>
+
+            {/* Mobile Contact */}
+            <div className="lg:hidden">
+              <a 
+                href={`tel:${businessPhone.replace(/\s/g, '')}`}
+                className="flex items-center space-x-1 text-primary-600 hover:text-primary-700"
+              >
+                <Phone className="w-4 h-4" />
+                <span className="text-xs sm:text-sm">Call</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>

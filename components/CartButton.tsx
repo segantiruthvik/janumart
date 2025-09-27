@@ -41,15 +41,15 @@ export default function CartButton() {
 
   return (
     <>
-      {/* Floating Cart Button - Mobile Optimized */}
+      {/* Floating Cart Button - Bigger and More Visible */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-primary-500 hover:bg-primary-600 text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-50 touch-manipulation"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-primary-500 hover:bg-primary-600 text-white p-4 sm:p-5 rounded-full shadow-xl hover:shadow-2xl transition-all duration-200 z-50 touch-manipulation"
       >
         <div className="relative">
-          <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
+          <ShoppingCart className="w-6 h-6 sm:w-7 sm:h-7" />
           {isClient && getTotalItems() > 0 && (
-            <span className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center font-bold">
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-sm rounded-full w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center font-bold">
               {getTotalItems()}
             </span>
           )}
