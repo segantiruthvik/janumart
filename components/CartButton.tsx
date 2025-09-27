@@ -41,48 +41,48 @@ export default function CartButton() {
 
   return (
     <>
-      {/* Floating Cart Button */}
+      {/* Floating Cart Button - Mobile Optimized */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 bg-primary-500 hover:bg-primary-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-50"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-primary-500 hover:bg-primary-600 text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-50 touch-manipulation"
       >
         <div className="relative">
-          <ShoppingCart className="w-6 h-6" />
+          <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
           {isClient && getTotalItems() > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+            <span className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center font-bold">
               {getTotalItems()}
             </span>
           )}
         </div>
       </button>
 
-      {/* Cart Modal */}
+      {/* Cart Modal - Mobile Optimized */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-md w-full max-h-[95vh] sm:max-h-[90vh] flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
-              <h2 className="text-xl font-semibold text-brown-900">Your Cart</h2>
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b flex-shrink-0">
+              <h2 className="text-lg sm:text-xl font-semibold text-brown-900">Your Cart</h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-700 touch-manipulation"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
 
             {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 min-h-0">
               {items.length === 0 ? (
-                <div className="text-center py-8">
-                  <ShoppingCart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">Your cart is empty</p>
+                <div className="text-center py-6 sm:py-8">
+                  <ShoppingCart className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-3 sm:mb-4" />
+                  <p className="text-sm sm:text-base text-gray-500">Your cart is empty</p>
                 </div>
               ) : (
                 items.map((item) => (
-                  <div key={item.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                  <div key={item.id} className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 bg-gray-50 rounded-lg">
                     {/* Product Image */}
-                    <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary-100 rounded-lg flex items-center justify-center">
                       {item.image ? (
                         <img
                           src={item.image}
@@ -90,42 +90,42 @@ export default function CartButton() {
                           className="w-full h-full object-cover rounded-lg"
                         />
                       ) : (
-                        <ShoppingCart className="w-6 h-6 text-primary-500" />
+                        <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-primary-500" />
                       )}
                     </div>
 
                     {/* Product Info */}
-                    <div className="flex-1">
-                      <h3 className="font-medium text-brown-900 text-sm">{item.name}</h3>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-brown-900 text-xs sm:text-sm truncate">{item.name}</h3>
                       {item.company && (
-                        <p className="text-xs text-brown-600">{item.company}</p>
+                        <p className="text-xs text-brown-600 truncate">{item.company}</p>
                       )}
-                      <p className="text-sm font-semibold text-primary-600">
+                      <p className="text-xs sm:text-sm font-semibold text-primary-600">
                         {formatPrice(item.price)}
                       </p>
                     </div>
 
                     {/* Quantity Controls */}
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="w-8 h-8 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-colors"
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-colors touch-manipulation"
                       >
-                        <Minus className="w-4 h-4" />
+                        <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
                       </button>
-                      <span className="w-8 text-center font-semibold text-primary-700">{item.quantity}</span>
+                      <span className="w-6 sm:w-8 text-center font-semibold text-primary-700 text-xs sm:text-sm">{item.quantity}</span>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="w-8 h-8 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-colors"
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-colors touch-manipulation"
                       >
-                        <Plus className="w-4 h-4" />
+                        <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                       </button>
                     </div>
 
                     {/* Remove Button */}
                     <button
                       onClick={() => removeItem(item.id)}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-red-500 hover:text-red-700 touch-manipulation"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -136,27 +136,27 @@ export default function CartButton() {
 
             {/* Customer Info & Total */}
             {items.length > 0 && (
-              <div className="p-4 border-t space-y-4 flex-shrink-0">
+              <div className="p-3 sm:p-4 border-t space-y-3 sm:space-y-4 flex-shrink-0">
                 {/* Customer Info */}
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   <input
                     type="text"
                     placeholder="Your Name (Optional)"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                   />
                   <input
                     type="tel"
                     placeholder="Your Phone (Optional)"
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                   />
                 </div>
 
                 {/* Total */}
-                <div className="flex justify-between items-center text-lg font-semibold">
+                <div className="flex justify-between items-center text-base sm:text-lg font-semibold">
                   <span>Total:</span>
                   <span className="text-primary-600">{formatPrice(getTotalPrice())}</span>
                 </div>
@@ -164,9 +164,9 @@ export default function CartButton() {
                 {/* Order Button */}
                 <button
                   onClick={handleWhatsAppOrder}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium flex items-center justify-center space-x-2"
+                  className="w-full bg-green-500 hover:bg-green-600 text-white py-3 sm:py-3 rounded-lg font-medium flex items-center justify-center space-x-2 touch-manipulation"
                 >
-                  <span>Order via WhatsApp</span>
+                  <span className="text-sm sm:text-base">Order via WhatsApp</span>
                 </button>
               </div>
             )}

@@ -133,25 +133,25 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-cream-50 to-primary-50">
       <Header />
       
-      <main className="container mx-auto px-3 py-4">
+      <main className="container mx-auto px-2 sm:px-3 py-3 sm:py-4">
         {/* Hero Section - Mobile Optimized */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-brown-900 mb-2">
+        <div className="text-center mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-brown-900 mb-1 sm:mb-2">
             {businessName}
           </h1>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-brown-700 mb-4">
+          <p className="text-xs sm:text-sm md:text-base lg:text-lg text-brown-700 mb-2 sm:mb-3">
             Premium Quality Food Distribution
           </p>
           <div className="flex items-center justify-center gap-1 text-primary-600">
             <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-current" />
-            <span className="text-xs sm:text-sm font-medium">Trusted by thousands of customers</span>
+            <span className="text-xs sm:text-sm font-medium">Trusted by thousands</span>
             <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-current" />
           </div>
         </div>
 
         {/* Search and Filter Bar - Mobile Optimized */}
-        <div className="max-w-4xl mx-auto mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="max-w-4xl mx-auto mb-4 sm:mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
             {/* Search Bar */}
             <div className="relative">
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -160,7 +160,7 @@ export default function HomePage() {
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                className="w-full pl-8 pr-3 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
               />
             </div>
             
@@ -169,7 +169,7 @@ export default function HomePage() {
               <select
                 value={selectedCompany}
                 onChange={(e) => setSelectedCompany(e.target.value)}
-                className="w-full pl-3 pr-6 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm appearance-none bg-white"
+                className="w-full pl-3 pr-6 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm appearance-none bg-white"
               >
                 <option value="">All Companies</option>
                 {companies.map((company) => (
@@ -187,10 +187,10 @@ export default function HomePage() {
           </div>
           
           {/* Show Offers Button */}
-          <div className="mt-3 text-center">
+          <div className="mt-2 sm:mt-3 text-center">
             <button
               onClick={() => setShowOffersOnly(!showOffersOnly)}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              className={`inline-flex items-center gap-2 px-4 py-2.5 sm:py-2 rounded-lg font-medium text-sm transition-colors touch-manipulation ${
                 showOffersOnly
                   ? 'bg-red-500 text-white hover:bg-red-600'
                   : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
@@ -203,10 +203,10 @@ export default function HomePage() {
           
           {/* Clear Filters */}
           {(searchTerm || selectedCompany || showOffersOnly) && (
-            <div className="mt-3 text-center">
+            <div className="mt-2 sm:mt-3 text-center">
               <button
                 onClick={clearAllFilters}
-                className="text-primary-600 hover:text-primary-700 text-xs font-medium"
+                className="text-primary-600 hover:text-primary-700 text-xs font-medium touch-manipulation"
               >
                 Clear all filters
               </button>
@@ -216,22 +216,22 @@ export default function HomePage() {
 
         {/* Products Grid - Mobile Optimized */}
         {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+          <div className="flex justify-center items-center py-8 sm:py-12">
+            <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-primary-500"></div>
           </div>
         ) : availableProducts.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
             {availableProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <Package className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-600 mb-2">
+          <div className="text-center py-8 sm:py-12">
+            <Package className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-2 sm:mb-3" />
+            <h3 className="text-base sm:text-lg font-semibold text-gray-600 mb-1 sm:mb-2">
               {showOffersOnly ? 'No offers available' : searchTerm ? 'No products found' : 'No products available'}
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs sm:text-sm text-gray-500">
               {showOffersOnly 
                 ? 'Check back later for new offers' 
                 : searchTerm 
@@ -243,21 +243,21 @@ export default function HomePage() {
         )}
 
         {/* Stats Section - Mobile Optimized */}
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-          <div className="bg-white rounded-lg p-4 shadow-md">
-            <div className="text-xl sm:text-2xl font-bold text-primary-600 mb-1">
+        <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-center">
+          <div className="bg-white rounded-lg p-3 sm:p-4 shadow-md">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-primary-600 mb-1">
               {availableProducts.length}
             </div>
             <div className="text-xs sm:text-sm text-gray-600">Products Available</div>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow-md">
-            <div className="text-xl sm:text-2xl font-bold text-primary-600 mb-1">
+          <div className="bg-white rounded-lg p-3 sm:p-4 shadow-md">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-primary-600 mb-1">
               1000+
             </div>
             <div className="text-xs sm:text-sm text-gray-600">Happy Customers</div>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow-md">
-            <div className="text-xl sm:text-2xl font-bold text-primary-600 mb-1">
+          <div className="bg-white rounded-lg p-3 sm:p-4 shadow-md">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-primary-600 mb-1">
               8AM-7PM
             </div>
             <div className="text-xs sm:text-sm text-gray-600">Mon-Sat Support</div>
