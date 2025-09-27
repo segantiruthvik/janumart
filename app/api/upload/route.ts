@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
+import { put } from '@vercel/blob'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,36 +15,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Only image files are allowed' }, { status: 400 })
     }
 
-    // Validate file size (max 5MB after compression)
+    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       return NextResponse.json({ error: 'File size must be less than 5MB' }, { status: 400 })
     }
 
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'uploads')
-    try {
-      await mkdir(uploadsDir, { recursive: true })
-    } catch (error) {
-      // Directory might already exist
-    }
-
-    // Generate unique filename with proper extension
+    // Generate unique filename
     const timestamp = Date.now()
     const fileExtension = file.name.split('.').pop() || 'jpg'
-    const filename = `${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-    const path = join(uploadsDir, filename)
+    const filename = `product-${timestamp}.${fileExtension}`
 
-    await writeFile(path, buffer)
+    // Upload to Vercel Blob
+    const blob = await put(filename, file, {
+      access: 'public',
+    })
 
-    // Return the public URL with file info
-    const fileUrl = `/uploads/${filename}`
-    
     return NextResponse.json({ 
       success: true, 
-      fileUrl,
+      fileUrl: blob.url,
       filename,
       originalSize: file.size,
       type: file.type
