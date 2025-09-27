@@ -94,7 +94,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <div className="card p-2 sm:p-3 hover:scale-105 transition-transform duration-200">
+    <div className="card p-2 sm:p-3 hover:scale-105 transition-transform duration-200 flex flex-col h-full">
       {/* Product Image */}
       <div className="relative mb-2 sm:mb-3">
         {product.image ? (
@@ -129,8 +129,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
 
-      {/* Product Info */}
-      <div className="space-y-1 sm:space-y-2">
+      {/* Product Info - Flexible content area */}
+      <div className="flex-1 space-y-1 sm:space-y-2">
         {/* Company */}
         {product.company && (
           <div className="flex items-center text-xs sm:text-sm text-brown-600">
@@ -167,8 +167,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
 
-      {/* Add Button and Quantity Controls - Fixed to Bottom Right */}
-      <div className="flex justify-end mt-2">
+      {/* Add Button and Quantity Controls - Fixed to Bottom */}
+      <div className="flex justify-end mt-auto pt-2">
         <div className="flex items-center space-x-1 sm:space-x-2">
           {/* Quantity Controls - Only show when quantity > 0 */}
           {currentQuantity > 0 && (
@@ -205,7 +205,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             </button>
           )}
         </div>
-      </div>
       </div>
     </div>
   )
