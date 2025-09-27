@@ -115,7 +115,8 @@ export default function ImageUpload({ value, onChange, disabled }: ImageUploadPr
       const result = await response.json()
 
       if (result.success) {
-        const fileUrl = `${window.location.origin}${result.fileUrl}`
+        // Use the fileUrl directly from the response (it's already a complete URL)
+        const fileUrl = result.fileUrl
         setPreview(fileUrl)
         onChange(fileUrl)
         toast.success(`Image uploaded successfully! (Compressed from ${originalSize}MB to ${compressedSize}MB)`)
