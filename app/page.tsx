@@ -136,9 +136,6 @@ export default function HomePage() {
       <main className="container mx-auto px-2 sm:px-3 py-3 sm:py-4">
         {/* Hero Section - Mobile Optimized */}
         <div className="text-center mb-4 sm:mb-6">
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-brown-900 mb-1 sm:mb-2">
-            {businessName}
-          </h1>
           <p className="text-xs sm:text-sm md:text-base lg:text-lg text-brown-700 mb-2 sm:mb-3">
             Premium Quality Food Distribution
           </p>

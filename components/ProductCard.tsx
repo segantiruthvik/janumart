@@ -160,50 +160,52 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
           
-          {/* Line 3: Per gm, Add Button, and Quantity Controls */}
-          <div className="flex items-center justify-between">
-            <div className="text-xs sm:text-sm text-gray-600">
-              <span className="font-medium">₹{pricePerGm.toFixed(2)}</span> per gm
-            </div>
-            
-            <div className="flex items-center space-x-1 sm:space-x-2">
-              {/* Quantity Controls - Only show when quantity > 0 */}
-              {currentQuantity > 0 && (
-                <div className="flex items-center space-x-1 bg-primary-50 border border-primary-200 rounded-lg px-1.5 py-0.5">
-                  <button
-                    onClick={() => handleQuantityChange(currentQuantity - 1)}
-                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-colors"
-                  >
-                    <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                  </button>
-                  <span className="text-xs sm:text-sm font-semibold px-1 sm:px-2 text-primary-700">{currentQuantity}</span>
-                  <button
-                    onClick={() => handleQuantityChange(currentQuantity + 1)}
-                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-colors"
-                  >
-                    <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                  </button>
-                </div>
-              )}
-              
-              {/* Add Button - Only show when quantity = 0 */}
-              {currentQuantity === 0 && (
-                <button
-                  onClick={handleAddToCart}
-                  disabled={!product.isAvailable || isAdding}
-                  className={`flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
-                    !product.isAvailable
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-primary-500 hover:bg-primary-600 text-white'
-                  }`}
-                >
-                  <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                  <span>{isAdding ? 'Adding...' : 'Add'}</span>
-                </button>
-              )}
-            </div>
+          {/* Line 3: Per gm */}
+          <div className="text-xs sm:text-sm text-gray-600">
+            <span className="font-medium">₹{pricePerGm.toFixed(2)}</span> per gm
           </div>
         </div>
+      </div>
+
+      {/* Add Button and Quantity Controls - Fixed to Bottom Right */}
+      <div className="flex justify-end mt-2">
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          {/* Quantity Controls - Only show when quantity > 0 */}
+          {currentQuantity > 0 && (
+            <div className="flex items-center space-x-1 bg-primary-50 border border-primary-200 rounded-lg px-1.5 py-0.5">
+              <button
+                onClick={() => handleQuantityChange(currentQuantity - 1)}
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-colors"
+              >
+                <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+              </button>
+              <span className="text-xs sm:text-sm font-semibold px-1 sm:px-2 text-primary-700">{currentQuantity}</span>
+              <button
+                onClick={() => handleQuantityChange(currentQuantity + 1)}
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-colors"
+              >
+                <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+              </button>
+            </div>
+          )}
+          
+          {/* Add Button - Only show when quantity = 0 */}
+          {currentQuantity === 0 && (
+            <button
+              onClick={handleAddToCart}
+              disabled={!product.isAvailable || isAdding}
+              className={`flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                !product.isAvailable
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-primary-500 hover:bg-primary-600 text-white'
+              }`}
+            >
+              <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+              <span>{isAdding ? 'Adding...' : 'Add'}</span>
+            </button>
+          )}
+        </div>
+      </div>
       </div>
     </div>
   )
