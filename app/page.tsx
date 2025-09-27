@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, ShoppingCart, Package, Star } from 'lucide-react'
+import { Search, ShoppingCart, Package, Star, Tag } from 'lucide-react'
 import { useCartStore } from '../lib/store'
 import { formatPrice } from '../lib/utils'
 import CartButton from '../components/CartButton'
@@ -36,6 +36,7 @@ export default function HomePage() {
   const [companies, setCompanies] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [isClient, setIsClient] = useState(false)
+  const [showOffersOnly, setShowOffersOnly] = useState(false)
   const { getTotalItems } = useCartStore()
 
   const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME || 'JANU ENTERPRISE'
@@ -54,27 +55,32 @@ export default function HomePage() {
       return
     }
     
-    if (searchTerm || selectedCompany) {
-      let filtered = products
-      
-      if (searchTerm) {
-        filtered = filtered.filter(product =>
-          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.company?.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      }
-      
-      if (selectedCompany) {
-        filtered = filtered.filter(product =>
-          product.company === selectedCompany
-        )
-      }
-      
-      setFilteredProducts(filtered)
-    } else {
-      setFilteredProducts(products)
+    let filtered = products
+    
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.company?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     }
-  }, [searchTerm, selectedCompany, products])
+    
+    // Apply company filter
+    if (selectedCompany) {
+      filtered = filtered.filter(product =>
+        product.company === selectedCompany
+      )
+    }
+    
+    // Apply offers filter
+    if (showOffersOnly) {
+      filtered = filtered.filter(product =>
+        product.offer && product.offer.isActive
+      )
+    }
+    
+    setFilteredProducts(filtered)
+  }, [searchTerm, selectedCompany, products, showOffersOnly])
 
   const fetchProducts = async () => {
     try {
@@ -117,38 +123,44 @@ export default function HomePage() {
     ? filteredProducts.filter(product => product.isAvailable)
     : []
 
+  const clearAllFilters = () => {
+    setSearchTerm('')
+    setSelectedCompany('')
+    setShowOffersOnly(false)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream-50 to-primary-50">
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold text-brown-900 mb-4">
+      <main className="container mx-auto px-3 py-4">
+        {/* Hero Section - Mobile Optimized */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-brown-900 mb-2">
             {businessName}
           </h1>
-          <p className="text-xl md:text-2xl text-brown-700 mb-8">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-brown-700 mb-4">
             Premium Quality Food Distribution
           </p>
-          <div className="flex items-center justify-center gap-2 text-primary-600">
-            <Star className="w-5 h-5 fill-current" />
-            <span className="font-medium">Trusted by thousands of customers</span>
-            <Star className="w-5 h-5 fill-current" />
+          <div className="flex items-center justify-center gap-1 text-primary-600">
+            <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-current" />
+            <span className="text-xs sm:text-sm font-medium">Trusted by thousands of customers</span>
+            <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-current" />
           </div>
         </div>
 
-        {/* Search and Filter Bar */}
-        <div className="max-w-4xl mx-auto mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Search and Filter Bar - Mobile Optimized */}
+        <div className="max-w-4xl mx-auto mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {/* Search Bar */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Search for rice, grains, oils, flour, biscuits, snacks..."
+                placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-lg"
+                className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
               />
             </div>
             
@@ -157,7 +169,7 @@ export default function HomePage() {
               <select
                 value={selectedCompany}
                 onChange={(e) => setSelectedCompany(e.target.value)}
-                className="w-full pl-4 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-lg appearance-none bg-white"
+                className="w-full pl-3 pr-6 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm appearance-none bg-white"
               >
                 <option value="">All Companies</option>
                 {companies.map((company) => (
@@ -166,23 +178,35 @@ export default function HomePage() {
                   </option>
                 ))}
               </select>
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
             </div>
           </div>
           
+          {/* Show Offers Button */}
+          <div className="mt-3 text-center">
+            <button
+              onClick={() => setShowOffersOnly(!showOffersOnly)}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                showOffersOnly
+                  ? 'bg-red-500 text-white hover:bg-red-600'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <Tag className="w-4 h-4" />
+              {showOffersOnly ? 'Hide Offers' : 'Show Offers'}
+            </button>
+          </div>
+          
           {/* Clear Filters */}
-          {(searchTerm || selectedCompany) && (
-            <div className="mt-4 text-center">
+          {(searchTerm || selectedCompany || showOffersOnly) && (
+            <div className="mt-3 text-center">
               <button
-                onClick={() => {
-                  setSearchTerm('')
-                  setSelectedCompany('')
-                }}
-                className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                onClick={clearAllFilters}
+                className="text-primary-600 hover:text-primary-700 text-xs font-medium"
               >
                 Clear all filters
               </button>
@@ -190,51 +214,53 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* Products Grid */}
+        {/* Products Grid - Mobile Optimized */}
         {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
           </div>
         ) : availableProducts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {availableProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-20">
-            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">
-              {searchTerm ? 'No products found' : 'No products available'}
+          <div className="text-center py-12">
+            <Package className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-600 mb-2">
+              {showOffersOnly ? 'No offers available' : searchTerm ? 'No products found' : 'No products available'}
             </h3>
-            <p className="text-gray-500">
-              {searchTerm 
-                ? 'Try adjusting your search terms' 
-                : 'Check back later for new products'
+            <p className="text-sm text-gray-500">
+              {showOffersOnly 
+                ? 'Check back later for new offers' 
+                : searchTerm 
+                  ? 'Try adjusting your search terms' 
+                  : 'Check back later for new products'
               }
             </p>
           </div>
         )}
 
-        {/* Stats Section */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <div className="text-3xl font-bold text-primary-600 mb-2">
+        {/* Stats Section - Mobile Optimized */}
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+          <div className="bg-white rounded-lg p-4 shadow-md">
+            <div className="text-xl sm:text-2xl font-bold text-primary-600 mb-1">
               {availableProducts.length}
             </div>
-            <div className="text-gray-600">Products Available</div>
+            <div className="text-xs sm:text-sm text-gray-600">Products Available</div>
           </div>
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <div className="text-3xl font-bold text-primary-600 mb-2">
+          <div className="bg-white rounded-lg p-4 shadow-md">
+            <div className="text-xl sm:text-2xl font-bold text-primary-600 mb-1">
               1000+
             </div>
-            <div className="text-gray-600">Happy Customers</div>
+            <div className="text-xs sm:text-sm text-gray-600">Happy Customers</div>
           </div>
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <div className="text-3xl font-bold text-primary-600 mb-2">
-              24/7
+          <div className="bg-white rounded-lg p-4 shadow-md">
+            <div className="text-xl sm:text-2xl font-bold text-primary-600 mb-1">
+              8AM-7PM
             </div>
-            <div className="text-gray-600">Order Support</div>
+            <div className="text-xs sm:text-sm text-gray-600">Mon-Sat Support</div>
           </div>
         </div>
       </main>

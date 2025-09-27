@@ -94,27 +94,27 @@ export default function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <div className="card p-4 hover:scale-105 transition-transform duration-200">
+    <div className="card p-2 sm:p-3 hover:scale-105 transition-transform duration-200">
       {/* Product Image */}
-      <div className="relative mb-4">
+      <div className="relative mb-2 sm:mb-3">
         {product.image ? (
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-48 object-cover rounded-lg"
+            className="w-full h-32 sm:h-40 object-cover rounded-lg"
             onError={(e) => {
               e.currentTarget.src = '/placeholder-food.jpg'
             }}
           />
         ) : (
-          <div className="w-full h-48 bg-gradient-to-br from-primary-100 to-cream-100 rounded-lg flex items-center justify-center">
-            <Package className="w-16 h-16 text-primary-400" />
+          <div className="w-full h-32 sm:h-40 bg-gradient-to-br from-primary-100 to-cream-100 rounded-lg flex items-center justify-center">
+            <Package className="w-8 h-8 sm:w-12 sm:h-12 text-primary-400" />
           </div>
         )}
         
         {/* Availability Badge with Weight */}
-        <div className="absolute top-2 right-2 flex flex-col items-end space-y-1">
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        <div className="absolute top-1 right-1 flex flex-col items-end space-y-1">
+          <span className={`px-1.5 py-0.5 rounded-full text-xs font-medium ${
             product.isAvailable 
               ? 'bg-green-100 text-green-800' 
               : 'bg-red-100 text-red-800'
@@ -122,7 +122,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.isAvailable ? 'Available' : 'Not Available'}
           </span>
           {product.weight && product.weightUnit && (
-            <span className="px-2 py-1 bg-white bg-opacity-90 rounded-full text-xs font-medium text-gray-700">
+            <span className="px-1.5 py-0.5 bg-white bg-opacity-90 rounded-full text-xs font-medium text-gray-700">
               {product.weight} {product.weightUnit}
             </span>
           )}
@@ -130,30 +130,29 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       {/* Product Info */}
-      <div className="space-y-2">
+      <div className="space-y-1 sm:space-y-2">
         {/* Company */}
         {product.company && (
-          <div className="flex items-center text-sm text-brown-600">
-            <Building2 className="w-4 h-4 mr-1" />
-            <span>{product.company}</span>
+          <div className="flex items-center text-xs sm:text-sm text-brown-600">
+            <Building2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+            <span className="truncate">{product.company}</span>
           </div>
         )}
 
         {/* Product Name */}
-        <h3 className="font-semibold text-brown-900 text-lg line-clamp-2">
+        <h3 className="font-semibold text-brown-900 text-sm sm:text-base line-clamp-2">
           {product.name}
         </h3>
 
-
         {/* Price - Line 1: Current Price */}
-        <div className="space-y-2">
-          <div className="text-2xl font-bold text-primary-600">
+        <div className="space-y-1 sm:space-y-2">
+          <div className="text-lg sm:text-xl font-bold text-primary-600">
             ₹{displayPrice.toFixed(2)}
           </div>
           
           {/* Line 2: Slashed Price and Offer */}
           {hasActiveOffer && product.offer && (
-            <div className="flex items-center space-x-2 text-sm">
+            <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm">
               <span className="line-through text-gray-500">₹{product.price.toFixed(2)}</span>
               <span className="text-red-600 font-medium">
                 {product.offer.discountPercentage}% OFF
@@ -163,26 +162,26 @@ export default function ProductCard({ product }: ProductCardProps) {
           
           {/* Line 3: Per gm, Add Button, and Quantity Controls */}
           <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600">
+            <div className="text-xs sm:text-sm text-gray-600">
               <span className="font-medium">₹{pricePerGm.toFixed(2)}</span> per gm
             </div>
             
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 sm:space-x-2">
               {/* Quantity Controls - Only show when quantity > 0 */}
               {currentQuantity > 0 && (
-                <div className="flex items-center space-x-1 bg-primary-50 border border-primary-200 rounded-lg px-2 py-1">
+                <div className="flex items-center space-x-1 bg-primary-50 border border-primary-200 rounded-lg px-1.5 py-0.5">
                   <button
                     onClick={() => handleQuantityChange(currentQuantity - 1)}
-                    className="w-6 h-6 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-colors"
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-colors"
                   >
-                    <Minus className="w-3 h-3" />
+                    <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   </button>
-                  <span className="text-sm font-semibold px-2 text-primary-700">{currentQuantity}</span>
+                  <span className="text-xs sm:text-sm font-semibold px-1 sm:px-2 text-primary-700">{currentQuantity}</span>
                   <button
                     onClick={() => handleQuantityChange(currentQuantity + 1)}
-                    className="w-6 h-6 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-colors"
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center transition-colors"
                   >
-                    <Plus className="w-3 h-3" />
+                    <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   </button>
                 </div>
               )}
@@ -192,13 +191,13 @@ export default function ProductCard({ product }: ProductCardProps) {
                 <button
                   onClick={handleAddToCart}
                   disabled={!product.isAvailable || isAdding}
-                  className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                     !product.isAvailable
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-primary-500 hover:bg-primary-600 text-white'
                   }`}
                 >
-                  <Plus className="w-3 h-3" />
+                  <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   <span>{isAdding ? 'Adding...' : 'Add'}</span>
                 </button>
               )}
