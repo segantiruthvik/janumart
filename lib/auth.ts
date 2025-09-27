@@ -28,9 +28,8 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        // For demo purposes, we'll use a simple password check
-        // In production, you should hash passwords properly
-        const isPasswordValid = credentials.password === 'admin123'
+        // Hardcoded admin password
+        const isPasswordValid = credentials.password === 'Archana@007'
 
         if (!isPasswordValid) {
           return null
