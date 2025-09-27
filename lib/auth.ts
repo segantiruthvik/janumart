@@ -18,36 +18,22 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        // Check against environment variables
-        const adminEmail = process.env.ADMIN_EMAIL
-        const adminPassword = process.env.ADMIN_PASSWORD
-
-        if (!adminEmail || !adminPassword) {
-          console.error('Admin credentials not configured in environment variables')
-          return null
-        }
-
-        // Verify email and password match environment variables
-        if (credentials.email !== adminEmail || credentials.password !== adminPassword) {
-          return null
-        }
-
-        // Create or find admin user
-        let user = await prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
           where: {
-            email: adminEmail
+            email: credentials.email
           }
         })
 
-        // If user doesn't exist, create admin user
-        if (!user) {
-          user = await prisma.user.create({
-            data: {
-              email: adminEmail,
-              name: 'Admin',
-              isAdmin: true
-            }
-          })
+        if (!user || !user.isAdmin) {
+          return null
+        }
+
+        // For demo purposes, we'll use a simple password check
+        // In production, you should hash passwords properly
+        const isPasswordValid = credentials.password === 'admin123'
+
+        if (!isPasswordValid) {
+          return null
         }
 
         return {

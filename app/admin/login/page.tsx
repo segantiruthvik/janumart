@@ -109,6 +109,14 @@ export default function AdminLogin() {
           </div>
         </div>
 
+        {/* Demo Credentials */}
+        <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h3 className="text-sm font-medium text-yellow-800 mb-2">Demo Credentials:</h3>
+          <p className="text-xs text-yellow-700">
+            Email: admin@januenterprise.com<br />
+            Password: admin123
+          </p>
+        </div>
       </div>
     </div>
   )
