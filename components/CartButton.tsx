@@ -6,8 +6,12 @@ import { useCartStore } from '../lib/store'
 import { formatPrice, formatWhatsAppMessage, generateWhatsAppURL } from '../lib/utils'
 import toast from 'react-hot-toast'
 
-export default function CartButton() {
-  const [isOpen, setIsOpen] = useState(false)
+interface CartButtonProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export default function CartButton({ isOpen, onClose }: CartButtonProps) {
   const [customerName, setCustomerName] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
   const [isClient, setIsClient] = useState(false)
@@ -34,28 +38,13 @@ export default function CartButton() {
     clearCart()
     setCustomerName('')
     setCustomerPhone('')
-    setIsOpen(false)
+    onClose()
     
     toast.success('Order sent to WhatsApp!')
   }
 
   return (
     <>
-      {/* Floating Cart Button - Bigger and More Visible */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-primary-500 hover:bg-primary-600 text-white p-4 sm:p-5 rounded-full shadow-xl hover:shadow-2xl transition-all duration-200 z-50 touch-manipulation"
-      >
-        <div className="relative">
-          <ShoppingCart className="w-6 h-6 sm:w-7 sm:h-7" />
-          {isClient && getTotalItems() > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-sm rounded-full w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center font-bold">
-              {getTotalItems()}
-            </span>
-          )}
-        </div>
-      </button>
-
       {/* Cart Modal - Mobile Optimized */}
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
@@ -64,7 +53,7 @@ export default function CartButton() {
             <div className="flex items-center justify-between p-3 sm:p-4 border-b flex-shrink-0">
               <h2 className="text-lg sm:text-xl font-semibold text-brown-900">Your Cart</h2>
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={onClose}
                 className="text-gray-500 hover:text-gray-700 touch-manipulation"
               >
                 <X className="w-5 h-5 sm:w-6 sm:h-6" />

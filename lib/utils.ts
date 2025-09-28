@@ -75,9 +75,7 @@ ${items.map(item =>
 
 💰 *Total Amount: ₹${total.toFixed(2)}*
 
-📞 Please confirm this order and provide delivery details.
-
-Thank you for choosing ${businessName}! 🏪`
+📞 Please confirm this order and provide delivery details.`
 
   return message
 }

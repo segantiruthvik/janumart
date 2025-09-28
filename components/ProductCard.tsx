@@ -62,7 +62,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const handleAddToCart = async () => {
     if (!product.isAvailable) {
-      toast.error('Product not available')
+      toast.error('Product is out of stock')
       return
     }
 
@@ -117,9 +117,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           <span className={`px-1.5 py-0.5 rounded-full text-xs font-medium ${
             product.isAvailable 
               ? 'bg-green-100 text-green-800' 
-              : 'bg-red-100 text-red-800'
+              : 'bg-orange-100 text-orange-800'
           }`}>
-            {product.isAvailable ? 'Available' : 'Not Available'}
+            {product.isAvailable ? 'Available' : 'Out of Stock'}
           </span>
           {product.weight && product.weightUnit && (
             <span className="px-1.5 py-0.5 bg-white bg-opacity-90 rounded-full text-xs font-medium text-gray-700">
@@ -196,12 +196,12 @@ export default function ProductCard({ product }: ProductCardProps) {
               disabled={!product.isAvailable || isAdding}
               className={`flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                 !product.isAvailable
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  ? 'bg-orange-300 text-orange-700 cursor-not-allowed'
                   : 'bg-primary-500 hover:bg-primary-600 text-white'
               }`}
             >
               <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-              <span>{isAdding ? 'Adding...' : 'Add'}</span>
+              <span>{!product.isAvailable ? 'Out of Stock' : isAdding ? 'Adding...' : 'Add'}</span>
             </button>
           )}
         </div>

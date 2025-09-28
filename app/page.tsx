@@ -262,8 +262,6 @@ export default function HomePage() {
         </div>
       </main>
 
-      {/* Floating Cart Button */}
-      {isClient && getTotalItems() > 0 && <CartButton />}
     </div>
   )
 }
