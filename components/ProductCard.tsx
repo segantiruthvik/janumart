@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { Plus, Package, Building2, Minus } from 'lucide-react'
 import { useCartStore } from '../lib/store'
 import { formatPrice, calculatePricePerGmFromWeight, calculateDiscountedPrice, isOfferActive } from '../lib/utils'
-import toast from 'react-hot-toast'
 
 interface Product {
   id: string
@@ -62,7 +61,6 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const handleAddToCart = async () => {
     if (!product.isAvailable) {
-      toast.error('Product is out of stock')
       return
     }
 
@@ -76,10 +74,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         image: product.image,
         company: product.company
       })
-      
-      toast.success(`${product.name} added to cart!`)
     } catch (error) {
-      toast.error('Failed to add item to cart')
+      // Silent error handling
     } finally {
       setIsAdding(false)
     }
