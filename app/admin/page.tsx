@@ -55,7 +55,7 @@ export default function AdminDashboard() {
     price: '',
     pricePerGm: '',
     weight: '',
-    weightUnit: 'kg',
+    weightUnit: 'gm',
     company: '',
     isAvailable: true,
     image: '',
