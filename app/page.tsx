@@ -84,7 +84,7 @@ export default function HomePage() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('/api/products?available=true')
+      const response = await fetch('/api/products')
       const data = await response.json()
       
       if (!response.ok) {
@@ -119,9 +119,7 @@ export default function HomePage() {
     }
   }
 
-  const availableProducts = Array.isArray(filteredProducts) 
-    ? filteredProducts.filter(product => product.isAvailable)
-    : []
+  const availableProducts = filteredProducts
 
   const clearAllFilters = () => {
     setSearchTerm('')
