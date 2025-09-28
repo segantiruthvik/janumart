@@ -7,15 +7,20 @@ import { formatPrice, formatWhatsAppMessage, generateWhatsAppURL } from '../lib/
 import toast from 'react-hot-toast'
 
 interface CartButtonProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen?: boolean
+  onClose?: () => void
 }
 
-export default function CartButton({ isOpen, onClose }: CartButtonProps) {
+export default function CartButton({ isOpen: externalIsOpen, onClose: externalOnClose }: CartButtonProps) {
   const [customerName, setCustomerName] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
   const [isClient, setIsClient] = useState(false)
+  const [internalIsOpen, setInternalIsOpen] = useState(false)
   const { items, updateQuantity, removeItem, getTotalItems, getTotalPrice, clearCart } = useCartStore()
+
+  // Use external state if provided, otherwise use internal state
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen
+  const onClose = externalOnClose || (() => setInternalIsOpen(false))
 
   useEffect(() => {
     setIsClient(true)
@@ -45,6 +50,23 @@ export default function CartButton({ isOpen, onClose }: CartButtonProps) {
 
   return (
     <>
+      {/* Floating Cart Button - Only show when used as floating button */}
+      {externalIsOpen === undefined && (
+        <button
+          onClick={() => setInternalIsOpen(true)}
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-primary-500 hover:bg-primary-600 text-white p-4 sm:p-5 rounded-full shadow-xl hover:shadow-2xl transition-all duration-200 z-50 touch-manipulation"
+        >
+          <div className="relative">
+            <ShoppingCart className="w-6 h-6 sm:w-7 sm:h-7" />
+            {isClient && getTotalItems() > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-sm rounded-full w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center font-bold">
+                {getTotalItems()}
+              </span>
+            )}
+          </div>
+        </button>
+      )}
+
       {/* Cart Modal - Mobile Optimized */}
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
