@@ -78,14 +78,24 @@ Subtotal: ₹${subtotal.toFixed(2)}
 Delivery Fee: ${deliveryFee === 0 ? 'FREE' : `₹${deliveryFee.toFixed(2)}`}
 ${codFee > 0 ? `COD Fee: ₹${codFee.toFixed(2)}\n` : ''}Total Amount: ₹${finalTotal.toFixed(2)}
 
-💳 *Payment Method:* ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}
+💳 *Payment Method:* ${paymentMethod === 'cod' ? 'Cash on Delivery' : paymentMethod === 'gpay' ? 'Google Pay' : paymentMethod === 'phonepe' ? 'PhonePe' : paymentMethod === 'paytm' ? 'Paytm' : 'UPI Payment'}
 
 📞 Please confirm this order and provide delivery details.`
 
   return message
 }
 
-export function generateWhatsAppURL(phoneNumber: string, message: string): string {
-  const encodedMessage = encodeURIComponent(message)
-  return `https://wa.me/${phoneNumber.replace(/\D/g, '')}?text=${encodedMessage}`
+export function generateUPIURL(paymentMethod: string, amount: number, mobileNumber: string = '9014231299'): string {
+  const upiId = `${mobileNumber}@paytm` // Default to Paytm UPI ID format
+  
+  switch (paymentMethod) {
+    case 'gpay':
+      return `tez://upi/pay?pa=${upiId}&pn=JANU%20MART&am=${amount}&cu=INR&tn=Order%20Payment`
+    case 'phonepe':
+      return `phonepe://pay?pa=${upiId}&pn=JANU%20MART&am=${amount}&cu=INR&tn=Order%20Payment`
+    case 'paytm':
+      return `paytmmp://pay?pa=${upiId}&pn=JANU%20MART&am=${amount}&cu=INR&tn=Order%20Payment`
+    default:
+      return `upi://pay?pa=${upiId}&pn=JANU%20MART&am=${amount}&cu=INR&tn=Order%20Payment`
+  }
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ShoppingCart, X, Minus, Plus, Trash2 } from 'lucide-react'
 import { useCartStore } from '../lib/store'
-import { formatPrice, formatWhatsAppMessage, generateWhatsAppURL } from '../lib/utils'
+import { formatPrice, formatWhatsAppMessage, generateWhatsAppURL, generateUPIURL } from '../lib/utils'
 import toast from 'react-hot-toast'
 
 interface CartButtonProps {
@@ -26,7 +26,7 @@ export default function CartButton({ isOpen: externalIsOpen, onClose: externalOn
     setIsClient(true)
   }, [])
 
-  const handleWhatsAppOrder = () => {
+  const handleOrder = () => {
     if (items.length === 0) {
       toast.error('Your cart is empty')
       return
@@ -41,19 +41,38 @@ export default function CartButton({ isOpen: externalIsOpen, onClose: externalOn
     const deliveryFee = getDeliveryFee()
     const codFee = getCodFee()
     const finalTotal = getFinalTotal()
-    const message = formatWhatsAppMessage(items, subtotal, deliveryFee, codFee, finalTotal, paymentMethod, customerName)
-    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210'
-    const whatsappURL = generateWhatsAppURL(whatsappNumber, message)
-    
-    window.open(whatsappURL, '_blank')
+
+    // Handle UPI payments
+    if (['gpay', 'phonepe', 'paytm', 'online'].includes(paymentMethod)) {
+      const upiURL = generateUPIURL(paymentMethod, finalTotal)
+      window.open(upiURL, '_blank')
+      
+      // Also send WhatsApp message for order confirmation
+      const message = formatWhatsAppMessage(items, subtotal, deliveryFee, codFee, finalTotal, paymentMethod, customerName)
+      const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210'
+      const whatsappURL = generateWhatsAppURL(whatsappNumber, message)
+      
+      // Open WhatsApp after a short delay
+      setTimeout(() => {
+        window.open(whatsappURL, '_blank')
+      }, 1000)
+      
+      toast.success('Opening payment app...')
+    } else {
+      // Handle COD - just send WhatsApp message
+      const message = formatWhatsAppMessage(items, subtotal, deliveryFee, codFee, finalTotal, paymentMethod, customerName)
+      const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210'
+      const whatsappURL = generateWhatsAppURL(whatsappNumber, message)
+      
+      window.open(whatsappURL, '_blank')
+      toast.success('Order sent to WhatsApp!')
+    }
     
     // Clear cart after sending
     clearCart()
     setCustomerName('')
     setCustomerPhone('')
     onClose()
-    
-    toast.success('Order sent to WhatsApp!')
   }
 
   return (
@@ -174,30 +193,73 @@ export default function CartButton({ isOpen: externalIsOpen, onClose: externalOn
                   />
                   
                   {/* Payment Method Selection */}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <label className="block text-sm font-medium text-gray-700">Payment Method</label>
-                    <div className="flex space-x-3">
-                      <label className="flex items-center space-x-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="paymentMethod"
-                          value="online"
-                          checked={paymentMethod === 'online'}
-                          onChange={(e) => setPaymentMethod(e.target.value as 'online' | 'cod')}
-                          className="text-primary-500 focus:ring-primary-500"
-                        />
-                        <span className="text-sm">Online Payment</span>
-                      </label>
-                      <label className="flex items-center space-x-2 cursor-pointer">
+                    
+                    {/* Online Payment Options */}
+                    <div className="space-y-2">
+                      <div className="text-xs text-gray-600 font-medium">Online Payment (No extra charges)</div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <label className="flex items-center space-x-2 cursor-pointer p-2 border border-gray-200 rounded-lg hover:bg-gray-50">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="gpay"
+                            checked={paymentMethod === 'gpay'}
+                            onChange={(e) => setPaymentMethod(e.target.value as any)}
+                            className="text-primary-500 focus:ring-primary-500"
+                          />
+                          <span className="text-sm font-medium text-green-600">GPay</span>
+                        </label>
+                        <label className="flex items-center space-x-2 cursor-pointer p-2 border border-gray-200 rounded-lg hover:bg-gray-50">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="phonepe"
+                            checked={paymentMethod === 'phonepe'}
+                            onChange={(e) => setPaymentMethod(e.target.value as any)}
+                            className="text-primary-500 focus:ring-primary-500"
+                          />
+                          <span className="text-sm font-medium text-purple-600">PhonePe</span>
+                        </label>
+                        <label className="flex items-center space-x-2 cursor-pointer p-2 border border-gray-200 rounded-lg hover:bg-gray-50">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="paytm"
+                            checked={paymentMethod === 'paytm'}
+                            onChange={(e) => setPaymentMethod(e.target.value as any)}
+                            className="text-primary-500 focus:ring-primary-500"
+                          />
+                          <span className="text-sm font-medium text-blue-600">Paytm</span>
+                        </label>
+                        <label className="flex items-center space-x-2 cursor-pointer p-2 border border-gray-200 rounded-lg hover:bg-gray-50">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="online"
+                            checked={paymentMethod === 'online'}
+                            onChange={(e) => setPaymentMethod(e.target.value as any)}
+                            className="text-primary-500 focus:ring-primary-500"
+                          />
+                          <span className="text-sm">Other UPI</span>
+                        </label>
+                      </div>
+                    </div>
+                    
+                    {/* COD Option */}
+                    <div className="space-y-2">
+                      <div className="text-xs text-gray-600 font-medium">Cash on Delivery</div>
+                      <label className="flex items-center space-x-2 cursor-pointer p-2 border border-gray-200 rounded-lg hover:bg-gray-50">
                         <input
                           type="radio"
                           name="paymentMethod"
                           value="cod"
                           checked={paymentMethod === 'cod'}
-                          onChange={(e) => setPaymentMethod(e.target.value as 'online' | 'cod')}
+                          onChange={(e) => setPaymentMethod(e.target.value as any)}
                           className="text-primary-500 focus:ring-primary-500"
                         />
-                        <span className="text-sm">Cash on Delivery (+₹20)</span>
+                        <span className="text-sm font-medium text-red-600">Cash on Delivery (+₹20)</span>
                       </label>
                     </div>
                   </div>
@@ -247,16 +309,23 @@ export default function CartButton({ isOpen: externalIsOpen, onClose: externalOn
 
                 {/* Order Button */}
                 <button
-                  onClick={handleWhatsAppOrder}
+                  onClick={handleOrder}
                   disabled={!isMinimumOrderMet()}
                   className={`w-full py-3 sm:py-3 rounded-lg font-medium flex items-center justify-center space-x-2 touch-manipulation ${
                     isMinimumOrderMet()
-                      ? 'bg-green-500 hover:bg-green-600 text-white'
+                      ? paymentMethod === 'cod' 
+                        ? 'bg-green-500 hover:bg-green-600 text-white'
+                        : 'bg-blue-500 hover:bg-blue-600 text-white'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
                   <span className="text-sm sm:text-base">
-                    {isMinimumOrderMet() ? 'Order via WhatsApp' : 'Minimum ₹50 required'}
+                    {!isMinimumOrderMet() 
+                      ? 'Minimum ₹50 required'
+                      : paymentMethod === 'cod' 
+                        ? 'Order via WhatsApp'
+                        : 'Pay & Order'
+                    }
                   </span>
                 </button>
               </div>

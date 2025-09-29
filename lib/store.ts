@@ -12,11 +12,11 @@ export interface CartItem {
 
 interface CartStore {
   items: CartItem[]
-  paymentMethod: 'online' | 'cod'
+  paymentMethod: 'online' | 'cod' | 'gpay' | 'phonepe' | 'paytm'
   addItem: (item: Omit<CartItem, 'quantity'>) => void
   removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
-  setPaymentMethod: (method: 'online' | 'cod') => void
+  setPaymentMethod: (method: 'online' | 'cod' | 'gpay' | 'phonepe' | 'paytm') => void
   clearCart: () => void
   getTotalItems: () => number
   getTotalPrice: () => number
@@ -86,7 +86,7 @@ export const useCartStore = create<CartStore>()(
         return 0 // No delivery fee below ₹50 (but order won't be allowed)
       },
       getCodFee: () => {
-        return get().paymentMethod === 'cod' ? 20 : 0 // ₹20 extra for COD
+        return get().paymentMethod === 'cod' ? 20 : 0 // ₹20 extra only for COD
       },
       getFinalTotal: () => {
         return get().getTotalPrice() + get().getDeliveryFee() + get().getCodFee()
