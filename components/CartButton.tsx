@@ -16,7 +16,7 @@ export default function CartButton({ isOpen: externalIsOpen, onClose: externalOn
   const [customerPhone, setCustomerPhone] = useState('')
   const [isClient, setIsClient] = useState(false)
   const [internalIsOpen, setInternalIsOpen] = useState(false)
-  const { items, updateQuantity, removeItem, getTotalItems, getTotalPrice, clearCart } = useCartStore()
+  const { items, updateQuantity, removeItem, getTotalItems, getTotalPrice, getDeliveryFee, getCodFee, getFinalTotal, getAmountForFreeDelivery, isMinimumOrderMet, paymentMethod, setPaymentMethod, clearCart } = useCartStore()
 
   // Use external state if provided, otherwise use internal state
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen
@@ -32,8 +32,16 @@ export default function CartButton({ isOpen: externalIsOpen, onClose: externalOn
       return
     }
 
-    const total = getTotalPrice()
-    const message = formatWhatsAppMessage(items, total, customerName)
+    if (!isMinimumOrderMet()) {
+      toast.error('Minimum order value is ₹50')
+      return
+    }
+
+    const subtotal = getTotalPrice()
+    const deliveryFee = getDeliveryFee()
+    const codFee = getCodFee()
+    const finalTotal = getFinalTotal()
+    const message = formatWhatsAppMessage(items, subtotal, deliveryFee, codFee, finalTotal, paymentMethod, customerName)
     const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210'
     const whatsappURL = generateWhatsAppURL(whatsappNumber, message)
     
@@ -164,20 +172,92 @@ export default function CartButton({ isOpen: externalIsOpen, onClose: externalOn
                     onChange={(e) => setCustomerPhone(e.target.value)}
                     className="w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                   />
+                  
+                  {/* Payment Method Selection */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Payment Method</label>
+                    <div className="flex space-x-3">
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="online"
+                          checked={paymentMethod === 'online'}
+                          onChange={(e) => setPaymentMethod(e.target.value as 'online' | 'cod')}
+                          className="text-primary-500 focus:ring-primary-500"
+                        />
+                        <span className="text-sm">Online Payment</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="cod"
+                          checked={paymentMethod === 'cod'}
+                          onChange={(e) => setPaymentMethod(e.target.value as 'online' | 'cod')}
+                          className="text-primary-500 focus:ring-primary-500"
+                        />
+                        <span className="text-sm">Cash on Delivery (+₹20)</span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Total */}
-                <div className="flex justify-between items-center text-base sm:text-lg font-semibold">
-                  <span>Total:</span>
-                  <span className="text-primary-600">{formatPrice(getTotalPrice())}</span>
+                {/* Order Breakdown */}
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Subtotal:</span>
+                    <span className="text-primary-600">{formatPrice(getTotalPrice())}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Delivery Fee:</span>
+                    <span className="text-primary-600">
+                      {getDeliveryFee() === 0 ? 'FREE' : formatPrice(getDeliveryFee())}
+                    </span>
+                  </div>
+                  {getCodFee() > 0 && (
+                    <div className="flex justify-between">
+                      <span>COD Fee:</span>
+                      <span className="text-primary-600">{formatPrice(getCodFee())}</span>
+                    </div>
+                  )}
+                  <div className="border-t pt-2 flex justify-between items-center text-base font-semibold">
+                    <span>Total:</span>
+                    <span className="text-primary-600">{formatPrice(getFinalTotal())}</span>
+                  </div>
                 </div>
+
+                {/* Free Delivery Message */}
+                {getAmountForFreeDelivery() > 0 && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <p className="text-sm text-green-700">
+                      Add <span className="font-semibold">₹{getAmountForFreeDelivery().toFixed(2)}</span> more for <span className="font-semibold">FREE delivery</span>
+                    </p>
+                  </div>
+                )}
+
+                {/* Minimum Order Warning */}
+                {!isMinimumOrderMet() && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+                    <p className="text-sm text-red-700">
+                      Minimum order value is <span className="font-semibold">₹50</span>
+                    </p>
+                  </div>
+                )}
 
                 {/* Order Button */}
                 <button
                   onClick={handleWhatsAppOrder}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white py-3 sm:py-3 rounded-lg font-medium flex items-center justify-center space-x-2 touch-manipulation"
+                  disabled={!isMinimumOrderMet()}
+                  className={`w-full py-3 sm:py-3 rounded-lg font-medium flex items-center justify-center space-x-2 touch-manipulation ${
+                    isMinimumOrderMet()
+                      ? 'bg-green-500 hover:bg-green-600 text-white'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
                 >
-                  <span className="text-sm sm:text-base">Order via WhatsApp</span>
+                  <span className="text-sm sm:text-base">
+                    {isMinimumOrderMet() ? 'Order via WhatsApp' : 'Minimum ₹50 required'}
+                  </span>
                 </button>
               </div>
             )}

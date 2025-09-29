@@ -57,11 +57,10 @@ export default function HomePage() {
     
     let filtered = products
     
-    // Apply search filter
+    // Apply search filter - only search by product names
     if (searchTerm) {
       filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.company?.toLowerCase().includes(searchTerm.toLowerCase())
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
     

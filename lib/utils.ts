@@ -59,7 +59,7 @@ export function formatPrice(price: number): string {
   }).format(price)
 }
 
-export function formatWhatsAppMessage(items: any[], total: number, customerName?: string): string {
+export function formatWhatsAppMessage(items: any[], subtotal: number, deliveryFee: number, codFee: number, finalTotal: number, paymentMethod: string, customerName?: string): string {
   const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME || 'JANU ENTERPRISE'
   
   const message = `🍽️ *${businessName} - Order Request*
@@ -73,7 +73,12 @@ ${items.map(item =>
   Subtotal: ₹${(item.price * item.quantity).toFixed(2)}`
 ).join('\n\n')}
 
-💰 *Total Amount: ₹${total.toFixed(2)}*
+💰 *Order Summary:*
+Subtotal: ₹${subtotal.toFixed(2)}
+Delivery Fee: ${deliveryFee === 0 ? 'FREE' : `₹${deliveryFee.toFixed(2)}`}
+${codFee > 0 ? `COD Fee: ₹${codFee.toFixed(2)}\n` : ''}Total Amount: ₹${finalTotal.toFixed(2)}
+
+💳 *Payment Method:* ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}
 
 📞 Please confirm this order and provide delivery details.`
 

@@ -9,7 +9,7 @@ export default function Header() {
   const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME || 'JANU ENTERPRISE'
   const businessPhone = process.env.NEXT_PUBLIC_BUSINESS_PHONE || '+91 9014231299'
   const businessEmail = process.env.NEXT_PUBLIC_BUSINESS_EMAIL || 'janugamez@gmail.com'
-  const { getTotalItems, getTotalPrice } = useCartStore()
+  const { getTotalItems, getFinalTotal } = useCartStore()
   const [isClient, setIsClient] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
 
@@ -46,7 +46,7 @@ export default function Header() {
                 </span>
                 {isClient && getTotalItems() > 0 && (
                   <span className="text-xs sm:text-sm font-bold text-primary-600">
-                    ₹{getTotalPrice().toFixed(2)}
+                    ₹{getFinalTotal().toFixed(2)}
                   </span>
                 )}
               </button>
