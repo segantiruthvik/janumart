@@ -12,11 +12,16 @@ export interface CartItem {
 
 interface CartStore {
   items: CartItem[]
-  paymentMethod: 'online' | 'cod' | 'gpay' | 'phonepe' | 'paytm'
+  paymentMethod: 'online' | 'cod' | 'gpay' | 'phonepe' | 'paytm' | 'qr'
+  paymentStatus: 'pending' | 'success' | 'failed' | 'verifying'
+  paymentAttempts: number
   addItem: (item: Omit<CartItem, 'quantity'>) => void
   removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
-  setPaymentMethod: (method: 'online' | 'cod' | 'gpay' | 'phonepe' | 'paytm') => void
+  setPaymentMethod: (method: 'online' | 'cod' | 'gpay' | 'phonepe' | 'paytm' | 'qr') => void
+  setPaymentStatus: (status: 'pending' | 'success' | 'failed' | 'verifying') => void
+  incrementPaymentAttempts: () => void
+  resetPaymentStatus: () => void
   clearCart: () => void
   getTotalItems: () => number
   getTotalPrice: () => number
@@ -31,7 +36,9 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
-      paymentMethod: 'online' as 'online' | 'cod',
+      paymentMethod: 'qr' as 'online' | 'cod' | 'gpay' | 'phonepe' | 'paytm' | 'qr',
+      paymentStatus: 'pending' as 'pending' | 'success' | 'failed' | 'verifying',
+      paymentAttempts: 0,
       addItem: (item) => {
         const items = get().items
         const existingItem = items.find(i => i.id === item.id)
@@ -69,6 +76,15 @@ export const useCartStore = create<CartStore>()(
       },
       setPaymentMethod: (method) => {
         set({ paymentMethod: method })
+      },
+      setPaymentStatus: (status) => {
+        set({ paymentStatus: status })
+      },
+      incrementPaymentAttempts: () => {
+        set({ paymentAttempts: get().paymentAttempts + 1 })
+      },
+      resetPaymentStatus: () => {
+        set({ paymentStatus: 'pending', paymentAttempts: 0 })
       },
       clearCart: () => {
         set({ items: [] })

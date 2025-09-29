@@ -85,6 +85,11 @@ ${codFee > 0 ? `COD Fee: ₹${codFee.toFixed(2)}\n` : ''}Total Amount: ₹${fina
   return message
 }
 
+export function generateWhatsAppURL(phoneNumber: string, message: string): string {
+  const encodedMessage = encodeURIComponent(message)
+  return `https://wa.me/${phoneNumber.replace(/\D/g, '')}?text=${encodedMessage}`
+}
+
 export function generateUPIURL(paymentMethod: string, amount: number, mobileNumber: string = '9014231299'): string {
   const upiId = `${mobileNumber}@paytm` // Default to Paytm UPI ID format
   

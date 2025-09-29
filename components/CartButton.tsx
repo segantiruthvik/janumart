@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { ShoppingCart, X, Minus, Plus, Trash2 } from 'lucide-react'
 import { useCartStore } from '../lib/store'
 import { formatPrice, formatWhatsAppMessage, generateWhatsAppURL, generateUPIURL } from '../lib/utils'
+import QRPaymentModal from './QRPaymentModal'
 import toast from 'react-hot-toast'
 
 interface CartButtonProps {
@@ -16,6 +17,7 @@ export default function CartButton({ isOpen: externalIsOpen, onClose: externalOn
   const [customerPhone, setCustomerPhone] = useState('')
   const [isClient, setIsClient] = useState(false)
   const [internalIsOpen, setInternalIsOpen] = useState(false)
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false)
   const { items, updateQuantity, removeItem, getTotalItems, getTotalPrice, getDeliveryFee, getCodFee, getFinalTotal, getAmountForFreeDelivery, isMinimumOrderMet, paymentMethod, setPaymentMethod, clearCart } = useCartStore()
 
   // Use external state if provided, otherwise use internal state
@@ -25,6 +27,28 @@ export default function CartButton({ isOpen: externalIsOpen, onClose: externalOn
   useEffect(() => {
     setIsClient(true)
   }, [])
+
+  const handleQRPaymentSuccess = () => {
+    const subtotal = getTotalPrice()
+    const deliveryFee = getDeliveryFee()
+    const codFee = getCodFee()
+    const finalTotal = getFinalTotal()
+    
+    // Send WhatsApp message for order confirmation
+    const message = formatWhatsAppMessage(items, subtotal, deliveryFee, codFee, finalTotal, paymentMethod, customerName)
+    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210'
+    const whatsappURL = generateWhatsAppURL(whatsappNumber, message)
+    
+    window.open(whatsappURL, '_blank')
+    
+    // Clear cart after sending
+    clearCart()
+    setCustomerName('')
+    setCustomerPhone('')
+    onClose()
+    
+    toast.success('Order placed successfully!')
+  }
 
   const handleOrder = () => {
     if (items.length === 0) {
@@ -41,6 +65,12 @@ export default function CartButton({ isOpen: externalIsOpen, onClose: externalOn
     const deliveryFee = getDeliveryFee()
     const codFee = getCodFee()
     const finalTotal = getFinalTotal()
+
+    // Handle QR payment
+    if (paymentMethod === 'qr') {
+      setIsQRModalOpen(true)
+      return
+    }
 
     // Handle UPI payments
     if (['gpay', 'phonepe', 'paytm', 'online'].includes(paymentMethod)) {
@@ -204,6 +234,17 @@ export default function CartButton({ isOpen: externalIsOpen, onClose: externalOn
                           <input
                             type="radio"
                             name="paymentMethod"
+                            value="qr"
+                            checked={paymentMethod === 'qr'}
+                            onChange={(e) => setPaymentMethod(e.target.value as any)}
+                            className="text-primary-500 focus:ring-primary-500"
+                          />
+                          <span className="text-sm font-medium text-green-600">QR Scan</span>
+                        </label>
+                        <label className="flex items-center space-x-2 cursor-pointer p-2 border border-gray-200 rounded-lg hover:bg-gray-50">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
                             value="gpay"
                             checked={paymentMethod === 'gpay'}
                             onChange={(e) => setPaymentMethod(e.target.value as any)}
@@ -232,17 +273,6 @@ export default function CartButton({ isOpen: externalIsOpen, onClose: externalOn
                             className="text-primary-500 focus:ring-primary-500"
                           />
                           <span className="text-sm font-medium text-blue-600">Paytm</span>
-                        </label>
-                        <label className="flex items-center space-x-2 cursor-pointer p-2 border border-gray-200 rounded-lg hover:bg-gray-50">
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="online"
-                            checked={paymentMethod === 'online'}
-                            onChange={(e) => setPaymentMethod(e.target.value as any)}
-                            className="text-primary-500 focus:ring-primary-500"
-                          />
-                          <span className="text-sm">Other UPI</span>
                         </label>
                       </div>
                     </div>
@@ -324,7 +354,9 @@ export default function CartButton({ isOpen: externalIsOpen, onClose: externalOn
                       ? 'Minimum ₹50 required'
                       : paymentMethod === 'cod' 
                         ? 'Order via WhatsApp'
-                        : 'Pay & Order'
+                        : paymentMethod === 'qr'
+                          ? 'Scan & Pay'
+                          : 'Pay & Order'
                     }
                   </span>
                 </button>
@@ -333,6 +365,14 @@ export default function CartButton({ isOpen: externalIsOpen, onClose: externalOn
           </div>
         </div>
       )}
+
+      {/* QR Payment Modal */}
+      <QRPaymentModal
+        isOpen={isQRModalOpen}
+        onClose={() => setIsQRModalOpen(false)}
+        amount={getFinalTotal()}
+        onPaymentSuccess={handleQRPaymentSuccess}
+      />
     </>
   )
 }
